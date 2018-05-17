@@ -33,9 +33,15 @@
 </script>
 ```
 
+npm
+
+```
+npm install zx-image-view --save-dev
+```
+
 ES6+
 ```javascript
-import ZxImageView from 'dist/js/zx-image-view.min.js'
+import ZxImageView from 'zx-image-view'
 ```
 
 ## # 效果图 preview
