@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Image-Preview zx1984</title>
+  <style>
+    #imgs .item {
+      float: left;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 50px;
+      height: 50px;
+      overflow: hidden;
+      box-sizing: border-box;
+      border: 1px solid #f1f1f1;
+      margin-right: 10px;
+    }
+    #imgs .item img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+<div id="imgs"></div>
+<script>
+  var imgs = [
+    'https://photo.tuchong.com/1000000/f/22405378.jpg',
+    'https://photo.tuchong.com/1000000/f/22405389.jpg',
+    'https://photo.tuchong.com/1000000/f/22405385.jpg',
+    'https://photo.tuchong.com/1000000/f/22405381.jpg',
+    'https://photo.tuchong.com/1000000/f/22405379.jpg',
+    'https://photo.tuchong.com/1000000/f/22405393.jpg',
+    'https://photo.tuchong.com/1000000/f/22405388.jpg',
+    'https://photo.tuchong.com/1000000/f/22396595.jpg',
+    'https://photo.tuchong.com/1000000/f/22396592.jpg',
+    'https://photo.tuchong.com/1000000/f/22396593.jpg',
+    'https://photo.tuchong.com/1000000/f/22396589.jpg',
+    'https://photo.tuchong.com/1000000/f/22396594.jpg',
+    'https://photo.tuchong.com/1000000/f/22396590.jpg',
+    'https://photo.tuchong.com/1000000/f/22396591.jpg'
+  ]
+  var $el = document.getElementById('imgs');
+  var html = '';
+  imgs.forEach(function (src) {
+    html += '<div class="item"><img src="'+ src +'" rotate-angle="' + randAngle() + '"></div>';
+  })
+  function randAngle () {
+    return 90 * (Math.floor(Math.random() * 100) % 4);
+  }
+  $el.innerHTML = html;
+</script>
+<script src="<%= htmlWebpackPlugin.files.chunks['zx-image-view'].entry %>"></script>
+<script>
+  var zip = new ZxImageView();
+  // console.log(zip);
+  zip.init($el, 'img')
+</script>
+</body>
+</html>
