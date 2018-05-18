@@ -10,7 +10,7 @@ export default {
    * 缩放
    */
   scale ($img, e) {
-    let wheelDelta = e.wheelDelta
+    let wheelDelta = e.wheelDelta || -e.detail
     if (wheelDelta > 0) {
       // 放大
       this._scaleHandler($img, e, true)
@@ -44,8 +44,8 @@ export default {
     let addW = iw - imgWidth
     let addH = ih - imgHeight
     let css = util.getStyleValue($img)
-    $img.style.marginTop = util.toNumber(css.marginTop) - addH / 2 + 'px'
-    $img.style.marginLeft = util.toNumber(css.marginLeft) - addW / 2 + 'px'
+    $img.style.top = util.int(util.toNumber(css.top) - addH / 2) + 'px'
+    $img.style.left = util.int(util.toNumber(css.left) - addW / 2) + 'px'
   },
 
   // 旋转
@@ -80,22 +80,22 @@ export default {
         iw = ih * imgWidth / imgHeight
         $img.style.width = iw + 'px'
         $img.style.height = ih + 'px'
-        // $img.style.marginTop = (winHeight - ih) / 2 + 'px'
+        // $img.style.top = (winHeight - ih) / 2 + 'px'
       } else {
         iw = imgWidth > winHeight * 0.9 ? winHeight * 0.9 : imgWidth
         ih = iw * imgHeight / imgWidth
         $img.style.width = iw + 'px'
         $img.style.height = ih + 'px'
       }
-      // $img.style.marginTop = (winHeight - ih) / 2 + 'px'
-      // $img.style.marginLeft = (winWidth - iw) / 2 + 'px'
+      // $img.style.top = (winHeight - ih) / 2 + 'px'
+      // $img.style.left = (winWidth - iw) / 2 + 'px'
     } else {
       if (imgRatio > winRatio) {
         iw = imgWidth > winWidth * 0.9 ? winWidth * 0.9 : imgWidth
         ih = iw * imgHeight / imgWidth
         $img.style.width = iw + 'px'
         $img.style.height = ih + 'px'
-        // $img.style.marginTop = (winHeight - ih) / 2 + 'px'
+        // $img.style.top = (winHeight - ih) / 2 + 'px'
       } else {
         ih = imgHeight > winHeight * 0.9 ? winHeight * 0.9 : imgHeight
         iw = ih * imgWidth / imgHeight
@@ -103,8 +103,8 @@ export default {
         $img.style.height = ih + 'px'
       }
     }
-    $img.style.marginTop = (winHeight - ih) / 2 + 'px'
-    $img.style.marginLeft = (winWidth - iw) / 2 + 'px'
+    $img.style.top = (winHeight - ih) / 2 + 'px'
+    $img.style.left = (winWidth - iw) / 2 + 'px'
     // console.log(winWidth, winHeight)
     // console.log(iw, ih)
     // console.log(imgRatio, winRatio)

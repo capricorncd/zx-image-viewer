@@ -2,6 +2,8 @@
 
 图片预览插件，支持图片切换、旋转、缩放、移动...
 
+浏览器支持：IE10+
+
 ## 键盘操作
 
 > 方向键：左`left`右`right`前后图片切换，上`up`下`down`顺时针逆时针旋转
@@ -41,7 +43,7 @@ npm install zx-image-view --save-dev
 
 ES6+
 ```javascript
-import ZxImageView from 'zx-image-view'
+import { ZxImageView } from 'zx-image-view'
 ```
 
 ## # 效果图 preview

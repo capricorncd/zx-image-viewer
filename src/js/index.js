@@ -6,7 +6,31 @@
 import '../style/image-preview.styl'
 import util from './util'
 import dom from './dom'
-import it from './img'
+import ic from './img-controls'
+
+// 默认配置
+const __DEFAULT = {
+  // 显示上一张箭头
+  showPrev: true,
+  // 显示下一张箭头
+  showNext: true,
+  // 缩放
+  scale: true,
+  // 旋转
+  rotate: true,
+  // 移动
+  move: true,
+  // 按键配置
+  keys: {
+    prev: 'left',
+    next: 'right',
+    // [放大，缩小]
+    scale: 'wheel',
+    // [Clockwise 顺时针, anticlockwise 逆时针]
+    rotate: ['up', 'down'],
+    close: 'esc'
+  }
+}
 
 const log = console.log
 
@@ -180,10 +204,12 @@ class ZxImageView {
     log('index.js _resetCurrent$img() angle: ' + angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
     this.$img.setAttribute('rotate-angle', angle)
-    it.rotate(this.$img, angle)
+    ic.rotate(this.$img, angle)
   }
 
   _eventHandler () {
+    // 鼠标在图片上按下
+    let isMousedownOnImage = false
     // 关闭
     this.$close.addEventListener('click', e => {
       e.stopPropagation()
@@ -194,6 +220,19 @@ class ZxImageView {
     this.$img.addEventListener('click', e => {
       e.stopPropagation()
     })
+
+    // 拖动图片
+    // this.$img.addEventListener('drag', e => {
+    //   e.preventDefault()
+    //   e.stopPropagation()
+    // })
+    //
+    // // 拖动图片
+    // this.$img.addEventListener('dragend', e => {
+    //   isMousedownOnImage = false
+    //   e.preventDefault()
+    //   e.stopPropagation()
+    // })
 
     // 点击preview容器
     this.$container.addEventListener('click', e => {
@@ -226,9 +265,13 @@ class ZxImageView {
 
     // 键盘事件
     window.addEventListener('keyup', e => {
+      isMousedownOnImage = false
       if (!this.isPreview) return
+      // 阻止方向键移动元素或滚动条
+      e.preventDefault()
       let keyCode = e.keyCode
-      // console.log(keyCode)
+      // log(keyCode, e.key, e.code, e.which)
+      // log(e)
       switch (keyCode) {
         // prev
         case 37:
@@ -246,68 +289,62 @@ class ZxImageView {
         case 40:
           this.rotate(true)
           break
+        case 27:
+          this.hide()
+          break
       }
       // e.preventDefault()
     })
 
     // 鼠标滚动事件
-    window.addEventListener('mousewheel', e => {
-      if (!this.isPreview) return
+    window.addEventListener('mousewheel',wheelHandler)
+    // 火狐鼠标滚动事件
+    window.addEventListener('DOMMouseScroll', wheelHandler)
+
+    const _this = this
+
+    function wheelHandler (e) {
+      if (!_this.isPreview) return
+      // log(e)
       const $el = e.target
-      if ($el !== this.$img) return
-      it.scale($el, e)
-      log(e)
-    })
+      if ($el !== _this.$img) return
+      ic.scale($el, e)
+    }
 
     /* 拖动 *************************************** */
-    // 鼠标在图片上按下
-    let isMousedownOnImage = false
-    // 鼠标按下位置
-    let mouseDownPostion = {}
+    // 鼠标按下位置图片左上角位置
+    let moveBeforePostion = {}
     // 图片位置
     let mouseDownImgPosition = {}
     // 开始
     this.$img.addEventListener('mousedown', e => {
       // log(e.type)
-      // e.preventDefault()
+      // 防止触发浏览器图片拖动行为
+      e.preventDefault()
       isMousedownOnImage = true
       // log(isMousedownOnImage)
-      mouseDownPostion.x = e.clientX
-      mouseDownPostion.y = e.clientY
+      moveBeforePostion.x = e.clientX - this.$img.offsetLeft
+      moveBeforePostion.y = e.clientY - this.$img.offsetTop
     })
 
-    let l, t, imgCss, pos
+    let l, t
     // 拖动
     document.addEventListener('mousemove', e => {
       if (!isMousedownOnImage) return
       e.preventDefault()
       log(e.type)
       let $img = this.$img
-      imgCss = util.getStyleValue($img)
 
-      // img盒子位置
-      pos = $img.getBoundingClientRect()
-      // 上边界
-      // 左边界
-      if (pos.height + pos.top >= 200 && pos.width + pos.left >= 200) {
+      l = e.clientX - moveBeforePostion.x
+      t = e.clientY - moveBeforePostion.y
 
-      }
-
-      l = util.toNumber(imgCss.marginLeft) + (e.clientX - mouseDownPostion.x)
-      t = util.toNumber(imgCss.marginTop) + (e.clientY - mouseDownPostion.y)
-
-      // log(e.clientX, e.clientY, l, t)
-      $img.style.marginLeft = l + 'px'
-      $img.style.marginTop = t + 'px'
-      log(pos)
+      $img.style.left = l + 'px'
+      $img.style.top = t + 'px'
     })
 
     // 释放鼠标
     document.addEventListener('mouseup', e => {
-      // log(e.type)
       isMousedownOnImage = false
-      // log(e.clientX - mouseDownPostion.x, e.clientY - mouseDownPostion.y)
-      // log(isMousedownOnImage)
     })
   }
 
@@ -369,7 +406,7 @@ class ZxImageView {
     let deg = isAnticlockwise ? -90 : 90
     const angle = util.int(this.$img.getAttribute('rotate-angle')) + deg
     this.$img.setAttribute('rotate-angle', angle)
-    it.rotate(this.$img, angle)
+    ic.rotate(this.$img, angle)
   }
 
   // 切换
@@ -397,7 +434,7 @@ class ZxImageView {
     const angle = util.int($img.getAttribute('rotate-angle'))
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
     this.$img.setAttribute('rotate-angle', angle)
-    it.rotate(this.$img, angle)
+    ic.rotate(this.$img, angle)
     this._changeTotalBarClass()
   }
 }
