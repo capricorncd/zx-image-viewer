@@ -58,5 +58,21 @@ export default {
       return true
     }
     return false
+  },
+  addClass ($el, cls) {
+    $el.classList.add(cls)
+  },
+  rmClass ($el, cls) {
+    $el.classList.remove(cls)
+  },
+  hasClass ($el, cls) {
+    return $el.classList.contains(cls)
+  },
+  attr ($el, attr, value) {
+    if (typeof value !== 'undefined') {
+      $el.setAttribute(attr, value)
+    } else {
+      return $el.getAttribute(attr)
+    }
   }
 }

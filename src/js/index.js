@@ -59,7 +59,7 @@ class ZxImageView {
     this.$img = dom.create({
       tag: 'img',
       attrs: {
-        class: 'zip-picture'
+        class: 'zip-picture v-transition'
       }
     })
     // 工具栏
@@ -157,7 +157,7 @@ class ZxImageView {
 
   // 销毁对象
   destroy () {
-    const $body = document.querySelector('body')
+    const $body = dom.query('body')
     try {
       $body.removeChild(this.$container)
       this.$container = null
@@ -203,8 +203,8 @@ class ZxImageView {
     const angle = util.int($img.getAttribute('rotate-angle'))
     log('index.js _resetCurrent$img() angle: ' + angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
-    this.$img.setAttribute('rotate-angle', angle)
-    ic.rotate(this.$img, angle)
+    dom.attr(this.$img, 'rotate-angle', angle)
+        ic.rotate(this.$img, angle)
   }
 
   _eventHandler () {
@@ -243,13 +243,13 @@ class ZxImageView {
     this.$tool.addEventListener('click', e => {
       e.stopPropagation()
       const $el = e.target
-      let isToolItem = $el.classList.contains('_item')
+      let isToolItem = dom.hasClass($el, '_item')
       if (!isToolItem) return
       // 旋转
-      if ($el.classList.contains('_rotate-hook')) {
+      if (dom.hasClass($el, '_rotate-hook')) {
         this.rotate()
       }
-      log($el.className)
+      // log($el.className)
     })
 
     // 点击统计栏
@@ -325,6 +325,7 @@ class ZxImageView {
       // log(isMousedownOnImage)
       moveBeforePostion.x = e.clientX - this.$img.offsetLeft
       moveBeforePostion.y = e.clientY - this.$img.offsetTop
+      dom.rmClass(this.$img, 'v-transition')
     })
 
     let l, t
@@ -332,7 +333,7 @@ class ZxImageView {
     document.addEventListener('mousemove', e => {
       if (!isMousedownOnImage) return
       e.preventDefault()
-      log(e.type)
+      // log(e.type)
       let $img = this.$img
 
       l = e.clientX - moveBeforePostion.x
@@ -345,6 +346,7 @@ class ZxImageView {
     // 释放鼠标
     document.addEventListener('mouseup', e => {
       isMousedownOnImage = false
+      dom.addClass(this.$img, 'v-transition')
     })
   }
 
@@ -353,9 +355,9 @@ class ZxImageView {
     if (this.$images.length <= 1) return
     // e.stopPropagation()
     const $el = e.target
-    let isToolItem = $el.classList.contains('_item')
+    let isToolItem = dom.hasClass($el, '_item')
     if (!isToolItem) return
-    let index = $el.getAttribute('data-index') >>> 0
+    let index = dom.attr($el, 'data-index') >>> 0
     // 当前点击index和this.index相同
     if (this.index === index) return
     this.index = index
@@ -366,8 +368,9 @@ class ZxImageView {
   // 修改统计栏item样式
   _changeTotalBarClass ($el) {
     $el = $el || this.$totalBar.querySelectorAll('._item')[this.index]
-    this.$totalBar.querySelector('._item-active').classList.remove('_item-active')
-    $el.classList.add('_item-active')
+    const $active = dom.query('._item-active', this.$totalBar)
+    dom.rmClass($active, '_item-active')
+    dom.addClass($el, '_item-active')
   }
 
   // 隐藏图片预览
@@ -404,8 +407,8 @@ class ZxImageView {
    */
   rotate (isAnticlockwise) {
     let deg = isAnticlockwise ? -90 : 90
-    const angle = util.int(this.$img.getAttribute('rotate-angle')) + deg
-    this.$img.setAttribute('rotate-angle', angle)
+    const angle = util.int(dom.attr(this.$img, 'rotate-angle')) + deg
+    dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
   }
 
@@ -431,9 +434,9 @@ class ZxImageView {
     }
     const $img = this.$images[this.index]
     this.$img.src = $img.src
-    const angle = util.int($img.getAttribute('rotate-angle'))
+    const angle = util.int(dom.attr($img, 'rotate-angle'))
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
-    this.$img.setAttribute('rotate-angle', angle)
+    dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
     this._changeTotalBarClass()
   }
