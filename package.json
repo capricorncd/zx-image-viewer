@@ -1,6 +1,6 @@
 {
   "name": "zx-image-view",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Image view plugin",
   "author": "zx1984",
   "repository": {
@@ -8,9 +8,11 @@
     "url": "git+https://github.com/zx1984/image-view.git"
   },
   "keywords": [
-    "calendar",
-    "pirce",
-    "jquery"
+    "imageView",
+    "image",
+    "view",
+    "viewer",
+    "preview"
   ],
   "scripts": {
     "start": "webpack-dev-server --color --inline --config build/webpack.dev.js",
