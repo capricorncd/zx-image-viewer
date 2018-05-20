@@ -17,25 +17,66 @@
     width 50px
     height 50px
     transform rotate(45deg)
+    transition all .3s
     opacity .6
+    &:before, &:after
+      position absolute
+      border-radius 1px
+      background-color #fff
+      content ''
     &:before
-      position absolute
       top 24px
-      left 5px
-      width 40px
+      left 10px
+      width 30px
       height 2px
-      background-color #fff
-      content ''
     &:after
-      position absolute
-      top 5px
+      top 10px
       left 24px
-      height 40px
+      height 30px
       width 2px
-      background-color #fff
-      content ''
     &:hover
       opacity .8
+      transform rotate(215deg)
+  // 左右切换
+  .zip-arrow
+    position absolute
+    z-index: 3
+    top: 50%
+    margin-top: -51px;
+    width 101px
+    height: 101px
+    opacity .6
+    filter: unquote('Alpha(opacity=60)')
+    cursor pointer
+    background-color: rgba(0, 0, 0, .1);
+    border-radius 50%
+    &:after
+      content ''
+      position absolute
+      top 35px
+      width 20px
+      height: 37px
+      background-image: url('../img/icons.png')
+      background-repeat: no-repeat
+      transition all .3s
+    &._prev-arrow
+      left: -50px;
+      &:after
+        right 22px
+        background-position: 0 0
+    &._next-arrow
+      right: -50px;
+      &:after
+        left: 22px;
+        background-position: -20px 0
+    &:hover
+      opacity .9
+      filter: unquote('Alpha(opacity=90)')
+      background-color: rgba(0, 0, 0, .2);
+      &._prev-arrow:after
+        right 25px
+      &._next-arrow:after
+        left: 25px;
   .zip-tool-wrapper
     position absolute
     z-index 2

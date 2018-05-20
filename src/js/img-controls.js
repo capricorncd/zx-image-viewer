@@ -4,12 +4,14 @@
  * https://github.com/zx1984
  */
 import util from './util'
+import dom from './dom'
 const MIN_SIZE = 60
 export default {
   /**
    * 缩放
    */
   scale ($img, e) {
+    // 浏览器兼容处理
     let wheelDelta = e.wheelDelta || -e.detail
     if (wheelDelta > 0) {
       // 放大
@@ -50,14 +52,50 @@ export default {
 
   // 旋转
   rotate ($img, angle) {
+    // ie9及以下浏览器禁用旋转
+    if (util.isLeIE9()) angle = 0
     // console.error(angle)
     $img.style.transform = `rotate(${angle}deg)`
     // console.log(this.$img)
     this._initImagePosition($img, angle)
   },
 
-  // 移动
-  move ($img, e) {},
+  // 移动， 拖动
+  move ($img) {
+    // 鼠标在图片上按下
+    let isMousedownOnImage = false
+    // 鼠标按下位置图片左上角位置
+    let moveBeforePostion = {}
+    // 开始
+    $img.addEventListener('mousedown', e => {
+      // log(e.type)
+      // 防止触发浏览器图片拖动行为
+      e.preventDefault()
+      isMousedownOnImage = true
+      moveBeforePostion.x = e.clientX - $img.offsetLeft
+      moveBeforePostion.y = e.clientY - $img.offsetTop
+      dom.rmClass($img, 'v-transition')
+    })
+
+    let l, t
+    // 拖动
+    document.addEventListener('mousemove', e => {
+      if (!isMousedownOnImage) return
+      e.preventDefault()
+
+      l = e.clientX - moveBeforePostion.x
+      t = e.clientY - moveBeforePostion.y
+
+      $img.style.left = l + 'px'
+      $img.style.top = t + 'px'
+    })
+
+    // 释放鼠标
+    document.addEventListener('mouseup', e => {
+      isMousedownOnImage = false
+      dom.addClass($img, 'v-transition')
+    })
+  },
 
   // 设置图片显示尺寸及位置
   _initImagePosition ($img, angle) {

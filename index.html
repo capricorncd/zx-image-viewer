@@ -55,8 +55,8 @@
 </script>
 <script src="<%= htmlWebpackPlugin.files.chunks['zx-image-view'].entry %>"></script>
 <script>
-  var zip = new ZxImageView();
-  // console.log(zip);
+  var zip = new ZxImageView({showSwitchArrow: true});
+//  console.log(zip);
   zip.init($el, 'img')
 </script>
 </body>

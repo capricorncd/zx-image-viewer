@@ -87,5 +87,54 @@ export default {
   },
   slice (arr) {
     return Array.prototype.slice.call(arr)
+  },
+  trim (s) {
+    return s ? s.replace(/^\s*|\s*$/g, '') : ''
+  },
+  /**
+   * 是否为ie9及以下版本浏览器
+   * @returns {*|boolean}
+   */
+  isLeIE9 () {
+    const ua = navigator.userAgent
+    let version = null
+    if (/MSIE (\d+)\./i.test(ua)) {
+      version = RegExp.$1
+    }
+    return version && +version <= 9
+  },
+  /**
+   * 是否为移动端设备
+   * @returns {boolean}
+   */
+  isNative () {
+    const ua = navigator.userAgent
+    const ipad = ua.match(/(iPad).*OS\s([\d_]+)/)
+    const isIphone = !ipad && ua.match(/(iPhone\sOS)\s([\d_]+)/)
+    const isAndroid = ua.match(/(Android)\s+([\d.]+)/)
+    return isIphone || isAndroid
+  },
+  isArray (arr) {
+    return Array.isArray(arr)
+  },
+  isObject (o) {
+    return o && !this.isArray(o) && typeof o !== 'function' && o instanceof Object
+  },
+  forceToObj (obj) {
+    return this.isObject(obj) ? obj : {}
+  },
+  extend (target, resource) {
+    let o = target
+    let i = arguments.length - 1
+    while (i >= 2) {
+      o = this.extend(arguments[i - 1], arguments[i])
+      i--
+    }
+    for (let key in resource) {
+      if (resource.hasOwnProperty(key)) {
+        o[key] = resource[key]
+      }
+    }
+    return o
   }
 }

@@ -35,6 +35,14 @@ module.exports = {
           'postcss-loader',
           'stylus-loader'
         ]
+      },
+      {
+        test: /\.(png|jpg|jpeg|svg)$/i,
+        loader: 'url-loader',
+        query: {
+          limit: 20180,
+          name: 'img/[name]-[hash:8].[ext]'
+        }
       }
     ]
   },

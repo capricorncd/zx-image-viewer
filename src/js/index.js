@@ -10,16 +10,16 @@ import ic from './img-controls'
 
 // 默认配置
 const __DEFAULT = {
-  // 显示上一张箭头
-  showPrev: true,
-  // 显示下一张箭头
-  showNext: true,
+  // 显示上一张/下一张箭头
+  showSwitchArrow: true,
   // 缩放
   scale: true,
   // 旋转
   rotate: true,
   // 移动
   move: true,
+  // 缩略图选择器
+  thumbSelector: 'img',
   // 按键配置
   keys: {
     prev: 'left',
@@ -37,7 +37,25 @@ const log = console.log
 const Z_INDEX = 9999
 
 class ZxImageView {
-  constructor (opts, itemSelector) {
+  constructor (opts) {
+    // 初始化参数
+    this.opts = util.isObject(opts) ? util.extend({}, __DEFAULT, opts) : __DEFAULT
+    this._init()
+    if (arguments.length > 1) {
+      // dom元素
+      if (util.isHTMLElement(arguments[1])) {
+        this.init(arguments[1])
+      } else if (typeof opts === 'string') {
+        // 缩略图标识
+        this.thumbSelector = opts
+      }
+    }
+  }
+
+  // 内部初始化
+  _init () {
+    const opts = this.opts
+    // log(opts)
     // preview是否显示
     this.isPreview = false
     // 预览容器
@@ -46,7 +64,21 @@ class ZxImageView {
       attrs: {
         class: 'zx-image-preview-wrapper',
         style: 'display:none'
-      }
+      },
+      child: [
+        {
+          tag: 'div',
+          attrs: {
+            class: 'zip-arrow _prev-arrow'
+          }
+        },
+        {
+          tag: 'div',
+          attrs: {
+            class: 'zip-arrow _next-arrow'
+          }
+        }
+      ]
     })
     // 关闭按钮
     this.$close = dom.create({
@@ -98,16 +130,11 @@ class ZxImageView {
     this.index = 0
     // 事件处理器
     this._eventHandler()
-    this.thumbSelector = 'img'
-    // 初始化参数处理
-    if (opts) {
-      // dom元素
-      if (util.isHTMLElement(opts)) {
-        this.init(opts, itemSelector)
-      } else if (typeof opts === 'string') {
-        // 缩略图标识
-        this.thumbSelector = opts
-      }
+    this.thumbSelector = opts.thumbSelector
+
+    if (!opts.showSwitchArrow) {
+      this.togglePrev()
+      this.toggleNext()
     }
   }
 
@@ -138,6 +165,7 @@ class ZxImageView {
         html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
       })
       this.$totalBar.innerHTML = html
+      this._checkArrowPrevNext()
     }
   }
 
@@ -200,16 +228,19 @@ class ZxImageView {
   _resetCurrent$img ($img) {
     $img = $img || this.$images[this.index]
     this.$img.src = $img.src
+    // 获取设置的图片旋转角度
     const angle = util.int($img.getAttribute('rotate-angle'))
-    log('index.js _resetCurrent$img() angle: ' + angle)
+    // log('index.js _resetCurrent$img() angle: ' + angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
     dom.attr(this.$img, 'rotate-angle', angle)
-        ic.rotate(this.$img, angle)
+    ic.rotate(this.$img, angle)
   }
 
+  /**
+   * 事件处理
+   * @private
+   */
   _eventHandler () {
-    // 鼠标在图片上按下
-    let isMousedownOnImage = false
     // 关闭
     this.$close.addEventListener('click', e => {
       e.stopPropagation()
@@ -222,21 +253,18 @@ class ZxImageView {
     })
 
     // 拖动图片
-    // this.$img.addEventListener('drag', e => {
-    //   e.preventDefault()
-    //   e.stopPropagation()
-    // })
-    //
-    // // 拖动图片
-    // this.$img.addEventListener('dragend', e => {
-    //   isMousedownOnImage = false
-    //   e.preventDefault()
-    //   e.stopPropagation()
-    // })
+    ic.move(this.$img)
 
     // 点击preview容器
     this.$container.addEventListener('click', e => {
-      this.hide()
+      const $el = e.target
+      if (dom.hasClass($el, '_prev-arrow')) {
+        this.prev()
+      } else if (dom.hasClass($el, '_next-arrow')) {
+        this.next()
+      } else {
+        this.hide()
+      }
     })
 
     // 工具栏点击事件
@@ -265,7 +293,6 @@ class ZxImageView {
 
     // 键盘事件
     window.addEventListener('keyup', e => {
-      isMousedownOnImage = false
       if (!this.isPreview) return
       // 阻止方向键移动元素或滚动条
       e.preventDefault()
@@ -297,7 +324,7 @@ class ZxImageView {
     })
 
     // 鼠标滚动事件
-    window.addEventListener('mousewheel',wheelHandler)
+    window.addEventListener('mousewheel', wheelHandler)
     // 火狐鼠标滚动事件
     window.addEventListener('DOMMouseScroll', wheelHandler)
 
@@ -310,44 +337,6 @@ class ZxImageView {
       if ($el !== _this.$img) return
       ic.scale($el, e)
     }
-
-    /* 拖动 *************************************** */
-    // 鼠标按下位置图片左上角位置
-    let moveBeforePostion = {}
-    // 图片位置
-    let mouseDownImgPosition = {}
-    // 开始
-    this.$img.addEventListener('mousedown', e => {
-      // log(e.type)
-      // 防止触发浏览器图片拖动行为
-      e.preventDefault()
-      isMousedownOnImage = true
-      // log(isMousedownOnImage)
-      moveBeforePostion.x = e.clientX - this.$img.offsetLeft
-      moveBeforePostion.y = e.clientY - this.$img.offsetTop
-      dom.rmClass(this.$img, 'v-transition')
-    })
-
-    let l, t
-    // 拖动
-    document.addEventListener('mousemove', e => {
-      if (!isMousedownOnImage) return
-      e.preventDefault()
-      // log(e.type)
-      let $img = this.$img
-
-      l = e.clientX - moveBeforePostion.x
-      t = e.clientY - moveBeforePostion.y
-
-      $img.style.left = l + 'px'
-      $img.style.top = t + 'px'
-    })
-
-    // 释放鼠标
-    document.addEventListener('mouseup', e => {
-      isMousedownOnImage = false
-      dom.addClass(this.$img, 'v-transition')
-    })
   }
 
   // 点击或鼠标滑过统计栏处理
@@ -393,10 +382,12 @@ class ZxImageView {
     }
   }
 
+  // 上一张
   prev () {
     this._switchImage('prev')
   }
 
+  // 下一张
   next () {
     this._switchImage('next')
   }
@@ -439,6 +430,24 @@ class ZxImageView {
     dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
     this._changeTotalBarClass()
+  }
+
+  // 验证图片切换键是否显示
+  _checkArrowPrevNext () {
+    if (this.$images.length <= 1) {
+      this.togglePrev()
+      this.toggleNext()
+    }
+  }
+
+  togglePrev (type) {
+    const $el = dom.query('._prev-arrow', this.$container)
+    $el.style.display = type === 'show' ? 'block' : 'none'
+  }
+
+  toggleNext (type) {
+    const $el = dom.query('._next-arrow', this.$container)
+    $el.style.display = type === 'show' ? 'block' : 'none'
   }
 }
 
