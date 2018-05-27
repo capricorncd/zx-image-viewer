@@ -66,7 +66,7 @@ import { ZxImageView } from 'zx-image-view'
 |showClose|Boolean|显示关闭预览窗口按钮，默认值`true`|
 |showPagination|Boolean|显示分页栏，默认值`true`|
 |showSwitchArrow|Boolean|显示左右切换箭头按钮，默认值`true`|
-|showToolbar|Boolean|显示工具栏，默认值`true`|
+|showToolbar|Boolean|显示工具栏，默认值`false`|
 |thumbSelector|String|缩略图选择器，默认值`img`。调用`init([], thumbSelector)`方法时可以覆盖此属性|
 
 ## 方法 methods
