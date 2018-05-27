@@ -29,11 +29,11 @@
   var options = {};
 
   // 使用方法1
-  var zip = new ZxImageView(options);
-  zip.init($el, 'img');
+  var ziv = new ZxImageView(options);
+  ziv.init($el, 'img');
 
   // 使用方法2
-  var zip2 = new ZxImageView(options, $el, 'img');
+  var ziv2 = new ZxImageView(options, $el, 'img');
 </script>
 ```
 
