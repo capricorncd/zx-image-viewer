@@ -8,24 +8,36 @@ import util from './util'
 import dom from './dom'
 import ic from './img-controls'
 
-// 默认配置
+window.util = util
+
+// 默认配置参数
 const __DEFAULT = {
+  // 背景遮罩透明度[0-1]
+  // backgroundOpacity: .6,
+  // 分页mouseover切换图片
+  paginationable: false,
+  // 显示关闭按钮
+  showClose: true,
   // 显示上一张/下一张箭头
   showSwitchArrow: true,
+  // 显示工具栏
+  showToolbar: false,
+  // 显示分页导航栏
+  showPagination: true,
   // 缩放
-  scale: true,
+  scalable: true,
   // 旋转
-  rotate: true,
+  rotatable: true,
   // 移动
-  move: true,
+  movable: true,
   // 缩略图选择器
   thumbSelector: 'img',
   // 按键配置
   keys: {
     prev: 'left',
     next: 'right',
-    // [放大，缩小]
-    scale: 'wheel',
+    // 滚动鼠标[放大，缩小]
+    scale: 'mousewheel',
     // [Clockwise 顺时针, anticlockwise 逆时针]
     rotate: ['up', 'down'],
     close: 'esc'
@@ -37,105 +49,120 @@ const log = console.log
 const Z_INDEX = 9999
 
 class ZxImageView {
-  constructor (opts) {
+  constructor (opts, arr, selector) {
+    let options, list, thumbSelector
+
+    if (selector && typeof selector === 'string') {
+      thumbSelector = selector
+    }
+
+    if (util.isHTMLElement(arr) || util.isArray(arr)) {
+      list = arr
+    } else if (typeof arr === 'string' && !thumbSelector) {
+      thumbSelector = arr
+    }
+
+    if (util.isObject(opts)) {
+      options = opts
+    } else if ((util.isHTMLElement(opts) || util.isArray(opts)) && !list) {
+      list = opts
+      options = __DEFAULT
+    }
+
     // 初始化参数
-    this.opts = util.isObject(opts) ? util.extend({}, __DEFAULT, opts) : __DEFAULT
+    this.opts = util.isObject(options) ? util.assign({}, __DEFAULT, options) : __DEFAULT
+    this.opts.thumbSelector = thumbSelector || 'img'
     this._init()
-    if (arguments.length > 1) {
-      // dom元素
-      if (util.isHTMLElement(arguments[1])) {
-        this.init(arguments[1])
-      } else if (typeof opts === 'string') {
-        // 缩略图标识
-        this.thumbSelector = opts
-      }
+    // 初始化数据
+    if (util.isHTMLElement(list) || util.isArray(opts)) {
+      this.init(list, thumbSelector)
     }
   }
 
   // 内部初始化
   _init () {
     const opts = this.opts
-    // log(opts)
-    // preview是否显示
-    this.isPreview = false
-    // 预览容器
-    this.$container = dom.create({
+    log(opts)
+    // 预览容器dom结构对象
+    const vnode = {
       tag: 'div',
       attrs: {
         class: 'zx-image-preview-wrapper',
         style: 'display:none'
       },
       child: [
+        // 预览图片
         {
-          tag: 'div',
+          tag: 'img',
           attrs: {
-            class: 'zip-arrow _prev-arrow'
-          }
-        },
-        {
-          tag: 'div',
-          attrs: {
-            class: 'zip-arrow _next-arrow'
+            class: 'zip-picture v-transition'
           }
         }
       ]
-    })
-    // 关闭按钮
-    this.$close = dom.create({
-      tag: 'div',
-      attrs: {
-        class: 'zip-close _cur'
-      }
-    })
-    // 预览图片
-    this.$img = dom.create({
-      tag: 'img',
-      attrs: {
-        class: 'zip-picture v-transition'
-      }
-    })
+    }
+    // 显示左右箭头
+    if (opts.showSwitchArrow) {
+      // 左右方向箭头
+      vnode.child.push({tag: 'div', attrs: {class: 'zip-arrow _prev-arrow'}})
+      vnode.child.push({tag: 'div', attrs: {class: 'zip-arrow _next-arrow'}})
+    }
+    // 显示关闭按钮
+    if(opts.showClose) {
+      vnode.child.push({tag: 'div', attrs: {class: 'zip-close _cur'}})
+    }
     // 工具栏
-    this.$tool = dom.create({
-      tag: 'div',
-      attrs: {
-        class: 'zip-tool-wrapper'
-      },
-      child: [
-        // {
-        //   tag: 'span',
-        //   attrs: {
-        //     class: '_item _rotate-hook'
-        //   },
-        //   child: ['旋转']
-        // }
-      ]
-    })
-    // 数量栏
-    this.$totalBar = dom.create({
-      tag: 'div',
-      attrs: {
-        class: 'zip-totalbar-wrapper'
-      }
-    })
-    this.$container.appendChild(this.$close)
-    this.$container.appendChild(this.$img)
-    this.$container.appendChild(this.$tool)
-    this.$container.appendChild(this.$totalBar)
+    if (opts.showToolbar) {
+      vnode.child.push({
+        tag: 'div',
+        attrs: {
+          class: 'zip-tool-wrapper'
+        },
+        child: [
+          {
+            tag: 'span',
+            attrs: {
+              class: '_item _rotate-hook'
+            },
+            child: ['旋转']
+          }
+        ]
+      })
+    }
+    // 数量、统计栏
+    if (opts.showPagination) {
+      vnode.child.push({tag: 'div', attrs: {class: 'zip-totalbar-wrapper'}})
+    }
+
+    // 创建dom结构
+    // 预览容器
+    this.$container = dom.create(vnode)
+    // 关闭按钮
+    this.$close = dom.query('.zip-close', this.$container)
+    // 预览图片
+    this.$img = dom.query('.zip-picture', this.$container)
+    // 工具栏
+    this.$tool = dom.query('.zip-tool-wrapper', this.$container)
+    // 分页栏
+    this.$pagination = dom.query('.zip-totalbar-wrapper', this.$container)
+
+    // 背景透明度
+    if (typeof opts.backgroundOpacity !== 'undefined') {
+      const bo = util.toNumber(opts.backgroundOpacity)
+      this.$container.style.background = `rgba(0, 0, 0, ${bo})`
+    }
+
+    // preview是否显示
+    this.isPreview = false
     // 是否添加到body
     this.isAppendToBody = dom.appendToBody(this.$container)
     // 图片元素数据
     this.$images = []
     // 缩略图容器
     this.$thumbContailner = null
+
     this.index = 0
     // 事件处理器
     this._eventHandler()
-    this.thumbSelector = opts.thumbSelector
-
-    if (!opts.showSwitchArrow) {
-      this.togglePrev()
-      this.toggleNext()
-    }
   }
 
   // 初始化
@@ -148,10 +175,10 @@ class ZxImageView {
     }
     this._thumbBindEvent($itemContainer)
     if (typeof selector === 'string') {
-      this.thumbSelector = selector
+      this.opts.thumbSelector = selector
     }
     // 获取图片元素
-    const $images = $itemContainer.querySelectorAll(this.thumbSelector)
+    const $images = $itemContainer.querySelectorAll(this.opts.thumbSelector)
     this._reset$Images($images)
   }
 
@@ -164,7 +191,7 @@ class ZxImageView {
       this.$images.forEach((item, index) => {
         html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
       })
-      this.$totalBar.innerHTML = html
+      this.$pagination.innerHTML = html
       this._checkArrowPrevNext()
     }
   }
@@ -242,7 +269,7 @@ class ZxImageView {
    */
   _eventHandler () {
     // 关闭
-    this.$close.addEventListener('click', e => {
+    this.$close && this.$close.addEventListener('click', e => {
       e.stopPropagation()
       this.hide()
     })
@@ -253,7 +280,11 @@ class ZxImageView {
     })
 
     // 拖动图片
-    ic.move(this.$img)
+    if (this.opts.movable) {
+      ic.move(this.$img)
+    } else {
+      this.$img.style.cursor = 'auto'
+    }
 
     // 点击preview容器
     this.$container.addEventListener('click', e => {
@@ -268,27 +299,27 @@ class ZxImageView {
     })
 
     // 工具栏点击事件
-    this.$tool.addEventListener('click', e => {
+    this.$tool && this.$tool.addEventListener('click', e => {
       e.stopPropagation()
       const $el = e.target
       let isToolItem = dom.hasClass($el, '_item')
       if (!isToolItem) return
       // 旋转
       if (dom.hasClass($el, '_rotate-hook')) {
-        this.rotate()
+        this._rotate()
       }
       // log($el.className)
     })
 
     // 点击统计栏
-    this.$totalBar.addEventListener('mouseover', e => {
-      this._handleClickTotalBar(e)
+    this.$pagination && this.opts.paginationable && this.$pagination.addEventListener('mouseover', e => {
+      // 处理事件
+      this._handleChangePage(e)
     })
 
-    // 点击统计栏
-    this.$totalBar.addEventListener('click', e => {
+    // 点击统计栏，阻止事件冒泡
+    this.$pagination && this.$pagination.addEventListener('click', e => {
       e.stopPropagation()
-      // this._handleClickTotalBar(e)
     })
 
     // 键盘事件
@@ -310,11 +341,11 @@ class ZxImageView {
           break
         // rotate up
         case 38:
-          this.rotate()
+          this._rotate()
           break
         // rotate down
         case 40:
-          this.rotate(true)
+          this._rotate(true)
           break
         case 27:
           this.hide()
@@ -335,12 +366,15 @@ class ZxImageView {
       // log(e)
       const $el = e.target
       if ($el !== _this.$img) return
-      ic.scale($el, e)
+      // 浏览器兼容处理
+      // 鼠标滚动方向
+      let wheelDelta = e.wheelDelta || -e.detail
+      _this._scale(wheelDelta)
     }
   }
 
   // 点击或鼠标滑过统计栏处理
-  _handleClickTotalBar (e) {
+  _handleChangePage (e) {
     if (this.$images.length <= 1) return
     // e.stopPropagation()
     const $el = e.target
@@ -356,8 +390,8 @@ class ZxImageView {
 
   // 修改统计栏item样式
   _changeTotalBarClass ($el) {
-    $el = $el || this.$totalBar.querySelectorAll('._item')[this.index]
-    const $active = dom.query('._item-active', this.$totalBar)
+    $el = $el || this.$pagination.querySelectorAll('._item')[this.index]
+    const $active = dom.query('._item-active', this.$pagination)
     dom.rmClass($active, '_item-active')
     dom.addClass($el, '_item-active')
   }
@@ -396,11 +430,23 @@ class ZxImageView {
    * 旋转
    * @param isAnticlockwise 是否逆时针
    */
-  rotate (isAnticlockwise) {
+  _rotate (isAnticlockwise) {
+    // 禁止旋转
+    if (!this.opts.rotatable) return
     let deg = isAnticlockwise ? -90 : 90
     const angle = util.int(dom.attr(this.$img, 'rotate-angle')) + deg
     dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
+  }
+
+  /**
+   * 缩放
+   * @private
+   */
+  _scale (wheelDelta) {
+    // 禁止缩放
+    if (!this.opts.scalable) return
+    ic.scale(this.$img, wheelDelta)
   }
 
   // 切换

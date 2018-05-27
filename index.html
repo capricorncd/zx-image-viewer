@@ -55,8 +55,25 @@
 </script>
 <script src="<%= htmlWebpackPlugin.files.chunks['zx-image-view'].entry %>"></script>
 <script>
-  var zip = new ZxImageView({showSwitchArrow: true});
-//  console.log(zip);
+  // 初始化参数
+  var _config = {
+    // 分页mouseover切换图片
+    paginationable: true,
+    // 显示关闭按钮
+    showClose: true,
+    // 显示上一张/下一张箭头
+    showSwitchArrow: true,
+    // 显示分页导航栏
+    showPagination: true,
+    // 缩放
+    scalable: true,
+    // 旋转
+    rotatable: true,
+    // 移动
+    movable: true
+  }
+  var zip = new ZxImageView(_config);
+  console.log(zip);
   zip.init($el, 'img')
 </script>
 </body>

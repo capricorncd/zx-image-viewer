@@ -6,6 +6,23 @@ import util from './util'
 const d = document
 export default {
   /**
+   * 向$content中添加元素$child
+   * @param $content
+   * @param $child
+   */
+  append ($content, $child) {
+    if (!$child) return
+    if (util.isArray($child)) {
+      for (let i = 0; i < $child.length; i++) {
+        if ($child[i]) {
+          $content.appendChild($child[i])
+        }
+      }
+    } else {
+      $content.appendChild($child)
+    }
+  },
+  /**
    * 创建dom节点
    * @param vnode 虚拟dom节点配置对象
    * @returns {*}

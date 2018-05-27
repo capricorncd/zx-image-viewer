@@ -1,4 +1,8 @@
 .zx-image-preview-wrapper
+  i
+    font-style normal !important;
+
+.zx-image-preview-wrapper
   position fixed
   z-index 9999
   top 0
@@ -94,7 +98,6 @@
     bottom 30px
     transform translateX(-50%)
     height 2px
-    // max-width 90%
     width 60%
     text-align: center
     ._item
@@ -105,6 +108,7 @@
       border-left: 1px solid transparent
       border-right: 1px solid transparent
       box-sizing border-box
+      vertical-align top
       &:after
         display: block
         content: ''

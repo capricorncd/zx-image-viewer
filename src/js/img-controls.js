@@ -9,21 +9,21 @@ const MIN_SIZE = 60
 export default {
   /**
    * 缩放
+   * @param $img 缩放对象
+   * @param wheelDelta > 0放大或 < 0缩小
    */
-  scale ($img, e) {
-    // 浏览器兼容处理
-    let wheelDelta = e.wheelDelta || -e.detail
+  scale ($img, wheelDelta) {
     if (wheelDelta > 0) {
       // 放大
-      this._scaleHandler($img, e, true)
+      this._scaleHandler($img, true)
     } else {
       // 缩小
-      this._scaleHandler($img, e)
+      this._scaleHandler($img)
     }
   },
 
   // @param isEnlarge 是否放大
-  _scaleHandler ($img, e, isEnlarge) {
+  _scaleHandler ($img, isEnlarge) {
     let naturalWidth = $img.naturalWidth
     // let naturalHeight = $img.naturalHeight
     let imgWidth = $img.width
