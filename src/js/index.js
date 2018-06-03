@@ -196,7 +196,7 @@ class ZxImageView {
       this.$images.forEach((item, index) => {
         html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
       })
-      this.$pagination.innerHTML = html
+      if (this.$pagination) this.$pagination.innerHTML = html
       this._checkArrowPrevNext()
     }
   }

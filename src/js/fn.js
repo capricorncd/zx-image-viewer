@@ -15,7 +15,24 @@ export function mouseWheel (wheelHandler) {
   window.addEventListener('DOMMouseScroll', wheelHandler)
 }
 
+/**
+ * 过滤和验证配置参数
+ * @param opts
+ * @returns {*}
+ */
 export function filterOptions (opts) {
-  let keys = opts.keyboard
+  let key, val, keyboard, arr
+  keyboard = opts.keyboard
+  arr = []
+  if (keyboard.prev === 'mousewheel') {
+    keyboard.next = null
+  }
+  for (key in keyboard) {
+    val = keyboard[key]
+    if (arr.indexOf(val) > -1) {
+      throw new Error(`keyboard配置键名${val}重复!`)
+    }
+    arr.push(val)
+  }
   return opts
 }

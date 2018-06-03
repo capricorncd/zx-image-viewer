@@ -66,7 +66,7 @@ for (let i = 0; i < LETTER.length; i++) {
   keyboards[LETTER[i]] = A_CODE + i
 }
 
-console.log(keyboards)
+// console.log(keyboards)
 
 export default {
   // 获取keyCode
