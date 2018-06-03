@@ -18,9 +18,15 @@ export default {
       o = this.assign(arguments[i - 1], arguments[i])
       i--
     }
-    for (let key in resource) {
+    let key, val
+    for (key in resource) {
       if (resource.hasOwnProperty(key)) {
-        o[key] = resource[key]
+        val = resource[key]
+        if (this.isObject(val)) {
+          this.assign(o[key], val)
+        } else {
+          o[key] = resource[key]
+        }
       }
     }
     return o
@@ -171,16 +177,6 @@ export default {
   },
 
   /**
-   * 转为数字
-   * @param n
-   * @returns {*}
-   */
-  toNumber (n) {
-    let m = parseFloat(n)
-    return isNaN(m) ? 0 : m
-  },
-
-  /**
    * 将字符串转换为驼峰写法
    * 比如：z-index => zIndex
    * @param attr
@@ -200,6 +196,34 @@ export default {
       str += arr[i].toUpperCase()[0] + arr[i].substr(1)
     }
     return str
+  },
+
+  /**
+   * 转换为小写
+   * @param s
+   * @returns {string}
+   */
+  toLower (s) {
+    return typeof s === 'string' ? s.toLowerCase() : s
+  },
+
+  /**
+   * 转为数字
+   * @param n
+   * @returns {*}
+   */
+  toNumber (n) {
+    let m = parseFloat(n)
+    return isNaN(m) ? 0 : m
+  },
+
+  /**
+   * 转换为大写
+   * @param s
+   * @returns {string}
+   */
+  toUpper (s) {
+    return typeof s === 'string' ? s.toUpperCase() : s
   },
 
   /**

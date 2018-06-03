@@ -7,6 +7,8 @@ import '../style/image-preview.styl'
 import util from './util'
 import dom from './dom'
 import ic from './img-controls'
+import keyboard from "./keyboard"
+import { mouseWheel, filterOptions } from './fn'
 
 window.util = util
 
@@ -33,18 +35,18 @@ const __DEFAULT = {
   // 缩略图选择器
   thumbSelector: 'img',
   // 按键配置
-  keys: {
+  keyboard: {
     prev: 'left',
     next: 'right',
     // 滚动鼠标[放大，缩小]
     scale: 'mousewheel',
     // [Clockwise 顺时针, anticlockwise 逆时针]
     rotate: ['up', 'down'],
-    close: 'esc'
+    close: 'escape'
   }
 }
 
-const log = console.log
+// const log = console.log
 
 const Z_INDEX = 9999
 
@@ -70,7 +72,10 @@ class ZxImageView {
     }
 
     // 初始化参数
-    this.opts = util.isObject(options) ? util.assign({}, __DEFAULT, options) : __DEFAULT
+    this.opts = util.isObject(options) ? util.assign(__DEFAULT, options) : __DEFAULT
+    // 判断键名配置是否有重复的
+    this.opts = filterOptions(this.opts)
+
     this.opts.thumbSelector = thumbSelector || 'img'
     this._init()
     // 初始化数据
@@ -82,7 +87,7 @@ class ZxImageView {
   // 内部初始化
   _init () {
     const opts = this.opts
-    log(opts)
+    // log(opts)
     // 预览容器dom结构对象
     const vnode = {
       tag: 'div',
@@ -322,46 +327,76 @@ class ZxImageView {
       e.stopPropagation()
     })
 
+    const keys = this.opts.keyboard || {}
     // 键盘事件
     window.addEventListener('keyup', e => {
       if (!this.isPreview) return
-      // 阻止方向键移动元素或滚动条
-      e.preventDefault()
       let keyCode = e.keyCode
       // log(keyCode, e.key, e.code, e.which)
-      // log(e)
-      switch (keyCode) {
-        // prev
-        case 37:
-          this.prev()
-          break
-        // next
-        case 39:
-          this.next()
-          break
-        // rotate up
-        case 38:
-          this._rotate()
-          break
-        // rotate down
-        case 40:
-          this._rotate(true)
-          break
-        case 27:
-          this.hide()
-          break
+      // 阻止方向键移动元素或滚动条
+      e.preventDefault()
+
+      // 上一张
+      if (keyboard.code(keys.prev) === keyCode) {
+        this.prev()
       }
-      // e.preventDefault()
+      // 下一张
+      if (keyboard.code(keys.next) === keyCode) {
+        this.next()
+      }
+      // 旋转
+      if (util.isArray(keys.rotate)) {
+        // 顺时针
+        if (keyboard.code(keys.rotate[0]) === keyCode) {
+          this._rotate()
+        }
+        // 逆时针
+        if (keyboard.code(keys.rotate[1]) === keyCode) {
+          this._rotate(true)
+        }
+      } else if (typeof keys.rotate === 'string' && keyboard.code(keys.rotate) === keyCode) {
+        // 顺时针
+        this._rotate()
+      }
+      // 缩放
+      if (util.isArray(keys.scale)) {
+        // 放大
+        if (keyboard.code(keys.scale[0]) === keyCode) {
+          this._scale(1)
+        }
+        // 缩小
+        if (keyboard.code(keys.scale[1]) === keyCode) {
+          this._scale(-1)
+        }
+      } else if (typeof keys.scale === 'string' && keyboard.code(keys.scale) === keyCode) {
+        this._scale(1)
+      }
+
+      // 关闭
+      if (keyboard.code(keys.close) === keyCode) {
+        this.hide()
+      }
     })
 
-    // 鼠标滚动事件
-    window.addEventListener('mousewheel', wheelHandler)
-    // 火狐鼠标滚动事件
-    window.addEventListener('DOMMouseScroll', wheelHandler)
+    // log(this.opts)
+    // 滚动鼠标前进后退
+    if (util.toLower(keys.prev) === 'mousewheel') {
+      mouseWheel(switchWheelHandler)
+    }
+
+    // 滚动鼠标缩放
+    if (util.toLower(keys.scale) === 'mousewheel') {
+      mouseWheel(scaleWheelHandler)
+    }
+
+    // 滚动鼠标旋转
+    if (util.toLower(keys.rotate) === 'mousewheel') {
+      mouseWheel(rotateWheelHandler)
+    }
 
     const _this = this
-
-    function wheelHandler (e) {
+    // 滚动鼠标缩放处理
+    function scaleWheelHandler (e) {
       if (!_this.isPreview) return
       // log(e)
       const $el = e.target
@@ -370,6 +405,18 @@ class ZxImageView {
       // 鼠标滚动方向
       let wheelDelta = e.wheelDelta || -e.detail
       _this._scale(wheelDelta)
+    }
+    // 滚动鼠标前后切换处理
+    function switchWheelHandler (e) {
+      if (!_this.isPreview) return
+      let wheelDelta = e.wheelDelta || -e.detail
+      wheelDelta > 0 ? _this.prev() : _this.next()
+    }
+    // 滚动鼠标旋转处理
+    function rotateWheelHandler (e) {
+      if (!_this.isPreview) return
+      let wheelDelta = e.wheelDelta || -e.detail
+      _this._rotate(wheelDelta > 0)
     }
   }
 

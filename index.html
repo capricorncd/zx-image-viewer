@@ -21,6 +21,7 @@
     #imgs .item img {
       width: 100%;
       height: auto;
+      cursor: pointer;
     }
   </style>
 </head>
@@ -46,7 +47,8 @@
   var $el = document.getElementById('imgs');
   var html = '';
   imgs.forEach(function (src) {
-    html += '<div class="item"><img src="'+ src +'" rotate-angle="' + randAngle() + '"></div>';
+    var angle = randAngle()
+    html += '<div class="item"><img src="'+ src +'" rotate-angle="' + angle + '" style="transform:rotate('+ angle +'deg)"></div>';
   })
   function randAngle () {
     return 90 * (Math.floor(Math.random() * 100) % 4);
@@ -70,7 +72,11 @@
     // 旋转
     rotatable: true,
     // 移动
-    movable: true
+    movable: true,
+    // 键盘配置
+    keyboard: {
+      // scale: ['equal', 'minus']
+    }
   }
   var ziv = new ZxImageView(_config);
   console.log(ziv);
