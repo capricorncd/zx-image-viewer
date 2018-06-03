@@ -145,7 +145,7 @@ import { ZxImageView } from 'zx-image-view'
 
 ```javascript
  // 初始化参数
-var _config = {
+let _config = {
   // 分页mouseover切换图片
   paginationable: true,
   // 显示关闭按钮
@@ -168,7 +168,7 @@ var _config = {
     scale: 'mousewheel'
   }
 }
-var new ZxImageView(_config);
+new ZxImageView(_config);
 ```
 
 ## 方法 methods
