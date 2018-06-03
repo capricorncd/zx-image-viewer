@@ -4,7 +4,7 @@
 
 浏览器支持：IE10+, (IE9不支持旋转功能)
 
-## 键盘操作
+## 默认键盘操作
 
 > 方向键：左`left`右`right`前后图片切换，上`up`下`down`顺时针逆时针旋转
 
@@ -50,9 +50,9 @@ import { ZxImageView } from 'zx-image-view'
 
 ## # 效果图 preview
 
-[image-view](resource/view-1.jpg)
+![image-view](resource/view-1.jpg)
 
-[image-view](resource/view-2.jpg)
+![image-view](resource/view-2.jpg)
 
 ## 参数 options
 
