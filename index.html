@@ -17,17 +17,23 @@
       box-sizing: border-box;
       border: 1px solid #f1f1f1;
       margin-right: 10px;
+      cursor: pointer;
     }
     #imgs .item img {
       width: 100%;
       height: auto;
-      cursor: pointer;
     }
   </style>
 </head>
 <body>
 <div id="imgs"></div>
+<script src="<%= htmlWebpackPlugin.files.chunks['zx-image-view'].entry %>"></script>
 <script>
+  // 随机生成90倍数的旋转角度
+  function randAngle () {
+    return 90 * (Math.floor(Math.random() * 100) % 4);
+  }
+  // 模拟数据，图片数组1
   var imgs = [
     'https://photo.tuchong.com/1000000/f/22405378.jpg',
     'https://photo.tuchong.com/1000000/f/22405389.jpg',
@@ -44,19 +50,28 @@
     'https://photo.tuchong.com/1000000/f/22396590.jpg',
     'https://photo.tuchong.com/1000000/f/22396591.jpg'
   ]
+  // 图片数组2
+  var imgs2 = []
+  // 获取图片列表容器
   var $el = document.getElementById('imgs');
   var html = '';
+  // 创建img dom
   imgs.forEach(function (src) {
     var angle = randAngle()
-    html += '<div class="item"><img src="'+ src +'" rotate-angle="' + angle + '" style="transform:rotate('+ angle +'deg)"></div>';
+    // 拼接html结构
+    html += '<div class="item" data-angle="' + angle + '"><img src="'+ src +'" style="transform:rotate('+ angle +'deg)"></div>';
+    // 生成imgs2数组
+    imgs2.push({
+      url: src,
+      angle: angle
+    })
   })
-  function randAngle () {
-    return 90 * (Math.floor(Math.random() * 100) % 4);
-  }
+  // 将图片添加至图片容器中
   $el.innerHTML = html;
-</script>
-<script src="<%= htmlWebpackPlugin.files.chunks['zx-image-view'].entry %>"></script>
-<script>
+
+  /**
+   * 插件使用 *****************************************************************************
+   */
   // 初始化参数
   var _config = {
     // 分页mouseover切换图片
@@ -78,9 +93,21 @@
       // scale: ['equal', 'minus']
     }
   }
-  var ziv = new ZxImageView(_config);
+  // 使用方法 2
+  var ziv2 = new ZxImageView(_config, imgs2);
+  console.log(ziv2);
+  // 查看第几张
+  var $images = $el.querySelectorAll('.item');
+  $images.forEach(function (item, index) {
+    // 点击央视为.item的元素时，显示图片查看器
+    item.addEventListener('click', function (e) {
+      ziv2.view(index);
+    })
+  })
+
+  // 使用方法 1
+  var ziv = new ZxImageView(imgs);
   console.log(ziv);
-  ziv.init($el, 'img')
 </script>
 </body>
 </html>

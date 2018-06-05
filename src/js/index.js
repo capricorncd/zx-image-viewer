@@ -8,9 +8,9 @@ import util from './util'
 import dom from './dom'
 import ic from './img-controls'
 import keyboard from "./keyboard"
-import { mouseWheel, filterOptions } from './fn'
+import { mouseWheel, filterOptions, fmtImageArray } from './fn'
 
-window.util = util
+// window.util = util
 
 // 默认配置参数
 const __DEFAULT = {
@@ -32,8 +32,6 @@ const __DEFAULT = {
   rotatable: true,
   // 移动
   movable: true,
-  // 缩略图选择器
-  thumbSelector: 'img',
   // 按键配置
   keyboard: {
     prev: 'left',
@@ -51,36 +49,20 @@ const __DEFAULT = {
 const Z_INDEX = 9999
 
 class ZxImageView {
-  constructor (opts, arr, selector) {
-    let options, list, thumbSelector
-
-    if (selector && typeof selector === 'string') {
-      thumbSelector = selector
+  constructor (opts, arr) {
+    if (typeof arr === 'undefined' && util.isArray(opts)) {
+      arr = opts
+      opts = undefined
     }
-
-    if (util.isHTMLElement(arr) || util.isArray(arr)) {
-      list = arr
-    } else if (typeof arr === 'string' && !thumbSelector) {
-      thumbSelector = arr
-    }
-
-    if (util.isObject(opts)) {
-      options = opts
-    } else if ((util.isHTMLElement(opts) || util.isArray(opts)) && !list) {
-      list = opts
-      options = __DEFAULT
-    }
-
     // 初始化参数
-    this.opts = util.isObject(options) ? util.assign(__DEFAULT, options) : __DEFAULT
+    let options = util.isObject(opts) ? util.assign(__DEFAULT, opts) : __DEFAULT
     // 判断键名配置是否有重复的
-    this.opts = filterOptions(this.opts)
-
-    this.opts.thumbSelector = thumbSelector || 'img'
+    this.opts = filterOptions(options)
+    // 图片数组
+    this.images = []
     this._init()
-    // 初始化数据
-    if (util.isHTMLElement(list) || util.isArray(opts)) {
-      this.init(list, thumbSelector)
+    if (util.isArray(arr)) {
+      this.init(arr, 0)
     }
   }
 
@@ -160,109 +142,95 @@ class ZxImageView {
     this.isPreview = false
     // 是否添加到body
     this.isAppendToBody = dom.appendToBody(this.$container)
-    // 图片元素数据
-    this.$images = []
-    // 缩略图容器
-    this.$thumbContailner = null
-
     this.index = 0
     // 事件处理器
     this._eventHandler()
   }
 
   // 初始化
-  init ($itemContainer, selector) {
+  init (images, index) {
     if (!this.isAppendToBody) {
       this.isAppendToBody = dom.appendToBody(this.$container)
     }
-    if (!util.isHTMLElement($itemContainer)) {
-      throw new Error(`init参数${$itemContainer}非html元素`)
+    // 初始化数据
+    let imgArray = fmtImageArray(images)
+    if (imgArray) {
+      this.images = imgArray
+    } else {
+      throw new Error(`图片数组images参数为空或格式不正确!`)
     }
-    this._thumbBindEvent($itemContainer)
-    if (typeof selector === 'string') {
-      this.opts.thumbSelector = selector
+    if (typeof index !== 'undefined') {
+      this.index = index >= this.images.length ? 0 : util.int(index)
     }
-    // 获取图片元素
-    const $images = $itemContainer.querySelectorAll(this.opts.thumbSelector)
-    this._reset$Images($images)
+    this._resetImages()
+    this._resetCurrent$img()
+  }
+
+  /**
+   * 更新当前图片数组
+   * @param images
+   */
+  update (images) {
+    this.init(images, 0)
   }
 
   // 重置图片thumb列表数据
-  _reset$Images ($images) {
-    if ($images) {
-      let html = ''
-      this.$images = util.slice($images)
-      let len = this.$images.length
-      this.$images.forEach((item, index) => {
-        html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
-      })
-      if (this.$pagination) this.$pagination.innerHTML = html
-      this._checkArrowPrevNext()
-    }
+  _resetImages () {
+    let html = ''
+    let len = this.images.length
+    this.images.forEach((item, index) => {
+      html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
+    })
+    if (this.$pagination) this.$pagination.innerHTML = html
+    this._checkArrowPrevNext()
   }
 
-  // 更新数据
-  update ($images, index = 0) {
-    if ($images instanceof NodeList) {
-      this._reset$Images($images)
+  /**
+   * 查看图片
+   * @param index 当前图片在数组中的索引
+   * @param angle 旋转角度
+   * @param images 图片数组
+   */
+  view (index = 0, angle, images) {
+    // 参数验证
+    if (typeof angle !== 'undefined') {
+      if (util.isArray(angle) && typeof images === 'undefined') {
+        images = angle
+        angle = null
+      }
     }
-  }
-
-  push ($images) {
-    if ($images instanceof NodeList) {
-      let $newArr = this.$images.concat(util.slice($images))
-      this._reset$Images($newArr)
+    let imgArray = fmtImageArray(images)
+    if (imgArray) {
+      this.images = imgArray
+      this._resetImages()
     }
+    if (index < this.images.length) {
+      this.index = util.int(index)
+    }
+    this._resetCurrent$img(angle)
+    this.show()
+    // 修改Pagination样式
+    this._changePaginationClass()
   }
 
   // 销毁对象
   destroy () {
-    const $body = dom.query('body')
     try {
-      $body.removeChild(this.$container)
+      this.$container.parentNode.removeChild(this.$container)
       this.$container = null
     } catch (e) {}
   }
 
-  // 缩略图事件绑定
-  _thumbBindEvent ($itemContainer) {
-    // 缩略图容器
-    if (this.$thumbContailner && $itemContainer !== this.$thumbContailner) {
-      this.$thumbContailner.removeEventListener('click', e => {
-        this._thumbClickHandler(e)
-      })
-    }
-    this.$thumbContailner = $itemContainer
-    this.$thumbContailner.addEventListener('click', e => {
-      this._thumbClickHandler(e)
-    })
-  }
-
-  // 缩略图容器事件处理
-  _thumbClickHandler (e) {
-    const $img = e.target
-    const isItem = this.$images.some(item => item === $img)
-    if (!isItem) return
-    this.show()
-    this._resetCurrent$img($img)
-    this._getThumbIndex($img)
-    this._changeTotalBarClass()
-  }
-
-  // 获取当前图片index
-  _getThumbIndex ($img) {
-    const index = this.$images.indexOf($img)
-    this.index = index !== -1 ? index : 0
-    // console.error('this.index: ' + this.index)
-  }
-
-  // 重置当前图片
-  _resetCurrent$img ($img) {
-    $img = $img || this.$images[this.index]
-    this.$img.src = $img.src
+  /**
+   * 重置当前被预览的图片
+   * @param _angle 设置旋转角度
+   * @private
+   */
+  _resetCurrent$img (_angle) {
+    let item = this.images[this.index]
+    this.$img.src = item.url
     // 获取设置的图片旋转角度
-    const angle = util.int($img.getAttribute('rotate-angle'))
-    // log('index.js _resetCurrent$img() angle: ' + angle)
+    let angle = util.int(_angle || item.angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
     dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
@@ -422,7 +390,7 @@ class ZxImageView {
 
   // 点击或鼠标滑过统计栏处理
   _handleChangePage (e) {
-    if (this.$images.length <= 1) return
+    if (this.images.length <= 1) return
     // e.stopPropagation()
     const $el = e.target
     let isToolItem = dom.hasClass($el, '_item')
@@ -431,12 +399,13 @@ class ZxImageView {
     // 当前点击index和this.index相同
     if (this.index === index) return
     this.index = index
-    this._changeTotalBarClass($el)
+    this._changePaginationClass($el)
     this._resetCurrent$img()
   }
 
   // 修改统计栏item样式
-  _changeTotalBarClass ($el) {
+  _changePaginationClass ($el) {
+    if (!this.$pagination) return
     $el = $el || this.$pagination.querySelectorAll('._item')[this.index]
     const $active = dom.query('._item-active', this.$pagination)
     dom.rmClass($active, '_item-active')
@@ -498,7 +467,7 @@ class ZxImageView {
 
   // 切换
   _switchImage (type) {
-    let maxIndex = this.$images.length - 1
+    let maxIndex = this.images.length - 1
     if (maxIndex <= 0) return
     switch (type) {
       case 'prev':
@@ -516,18 +485,18 @@ class ZxImageView {
         }
         break
     }
-    const $img = this.$images[this.index]
-    this.$img.src = $img.src
-    const angle = util.int(dom.attr($img, 'rotate-angle'))
+    let item = this.images[this.index]
+    this.$img.src = item.url
+    const angle = util.int(item.angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
     dom.attr(this.$img, 'rotate-angle', angle)
     ic.rotate(this.$img, angle)
-    this._changeTotalBarClass()
+    this._changePaginationClass()
   }
 
   // 验证图片切换键是否显示
   _checkArrowPrevNext () {
-    if (this.$images.length <= 1) {
+    if (this.images.length <= 1) {
       this.togglePrev()
       this.toggleNext()
     }

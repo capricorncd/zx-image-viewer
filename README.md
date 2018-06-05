@@ -26,14 +26,44 @@
   // 获取图片容器dom元素
   var $el = document.getElementById('imgList');
   // 初始化参数
-  var options = {};
+  var options = {
+    // 见参数说明处
+  };
 
   // 使用方法1
-  var ziv = new ZxImageView(options);
-  ziv.init($el, 'img');
+  var imgArray1 = [
+    'http://xxx.com/a.jpg',
+    'http://xxx.com/b.jpg',
+    'http://xxx.com/c.jpg',
+    'http://xxx.com/d.jpg'
+  ];
+  var ziv1 = new ZxImageView(options, imgArray1);
 
   // 使用方法2
-  var ziv2 = new ZxImageView(options, $el, 'img');
+  var imgArray2 = [
+    {
+      url: 'http://xxx.com/a.jpg',
+      // 默认选择角度
+      angle: 90
+    },
+    {
+      url: 'http://xxx.com/b.jpg',
+      angle: 0
+    },
+    {
+      url: 'http://xxx.com/c.jpg',
+      angle: 180
+    },
+    {
+      url: 'http://xxx.com/d.jpg'
+      angle: 90
+    }
+  ];
+  var ziv2 = new ZxImageView(imgArray2);
+
+  // 使用方法3
+  var ziv3 = new ZxImageView();
+  ziv3.init(imgArray2);
 </script>
 ```
 
@@ -41,11 +71,20 @@ npm
 
 ```
 npm install zx-image-view --save-dev
+# 或
+npm i zx-image-view -D
 ```
 
 ES6+
 ```javascript
 import { ZxImageView } from 'zx-image-view'
+```
+
+开发调试
+
+```
+npm run start
+# http://localhost:9000/
 ```
 
 ## # 效果图 preview
@@ -80,9 +119,66 @@ import { ZxImageView } from 'zx-image-view'
 |rotate|String或Array|任意键或`mousewheel`|图片旋转|
 |close|String|关闭图片查看器|
 
-主要：参数中只能包含有且一个`mousewheel`配置；任何配置均不支持组合键。
+注意：参数中只能包含有且一个`mousewheel`配置；任何配置均不支持组合键。
 
-#### 支持自定义键盘按钮名/keyboard参数可选属性
+keyboard参数可选属性见页尾--附录
+
+```javascript
+ // 初始化参数
+let _config = {
+  // 分页mouseover切换图片
+  paginationable: true,
+  // 显示关闭按钮
+  showClose: true,
+  // 显示上一张/下一张箭头
+  showSwitchArrow: true,
+  // 显示分页导航栏
+  showPagination: true,
+  // 缩放
+  scalable: true,
+  // 旋转
+  rotatable: true,
+  // 移动
+  movable: true,
+  // 键盘配置
+  keyboard: {
+    prev: 'a',
+    next: 'd',
+    rotate: ['up', 'down'],
+    scale: 'mousewheel'
+  }
+}
+new ZxImageView(_config);
+```
+
+## 方法 methods
+
+* destroy() 销毁当前图片查看dom对象
+
+* init(imageArray, index) 初始化图片数据
+
+|参数|类型|必须|说明|
+|:--|:--|:--|:--|
+|imageArray|Array|是|图片url数组|
+|index|Number|否|imageArray的索引，默认显示的第`index + 1`张图片；默认为`0`; 如果`index > imageArray.length`将被忽略|
+
+* update(imageArray) 更新图片数据；与`init()`基本相同
+
+|参数|类型|必须|说明|
+|:--|:--|:--|:--|
+|imageArray|Array|是|图片url数组|
+
+* view(index, angle, imageArray) 查看第`index + 1`张图片
+
+|参数|类型|必须|说明|
+|:--|:--|:--|:--|
+|index|Number|是|imageArray的索引，显示的第`index + 1`张图片|
+|angle|Number|否|图片旋转角度，90的整数倍|
+|imageArray|Array|否|图片url数组，将更新初始化的图片数组|
+
+## 附录
+
+支持自定义键盘按钮名/keyboard参数可选属性
 
 |属性|键名/说明|
 |:--|:--|
@@ -142,38 +238,6 @@ import { ZxImageView } from 'zx-image-view'
 |鼠标滚动|说明|
 |:--|:--|
 |mousewheel|鼠标滚动键|
-
-```javascript
- // 初始化参数
-let _config = {
-  // 分页mouseover切换图片
-  paginationable: true,
-  // 显示关闭按钮
-  showClose: true,
-  // 显示上一张/下一张箭头
-  showSwitchArrow: true,
-  // 显示分页导航栏
-  showPagination: true,
-  // 缩放
-  scalable: true,
-  // 旋转
-  rotatable: true,
-  // 移动
-  movable: true,
-  // 键盘配置
-  keyboard: {
-    prev: 'a',
-    next: 'd',
-    rotate: ['up', 'down'],
-    scale: 'mousewheel'
-  }
-}
-new ZxImageView(_config);
-```
-
-## 方法 methods
-
-* init()
 
 ## Copyright and license
 

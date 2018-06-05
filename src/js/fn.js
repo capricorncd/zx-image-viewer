@@ -3,6 +3,7 @@
  * https://github.com/zx1984
  */
 'use strict';
+import util from './util'
 
 /**
  * 滚动鼠标事件
@@ -35,4 +36,22 @@ export function filterOptions (opts) {
     arr.push(val)
   }
   return opts
+}
+
+/**
+ * 格式化图片数组
+ * @param images
+ * @returns {*}
+ */
+export function fmtImageArray (images) {
+  if (!util.isArray(images)) return null
+  if (images.length === 0) return null
+  let item = images[0]
+  if (typeof item === 'string') {
+    return images.map(url => {
+      return { url }
+    })
+  } else {
+    return item.url ? images : null
+  }
 }
