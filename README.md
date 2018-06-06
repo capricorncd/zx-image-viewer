@@ -16,10 +16,10 @@
 
 ```html
 <div id="imgList">
-  <img src="a.jpg">
-  <img src="b.jpg">
-  <img src="c.jpg">
-  <img src="d.jpg">
+  <img data-index="0" src="a.jpg">
+  <img data-index="1" src="b.jpg">
+  <img data-index="2" src="c.jpg">
+  <img data-index="3" src="d.jpg">
 </div>
 <script src="dist/js/zx-image-view.min.js"></script>
 <script>
@@ -39,11 +39,22 @@
   ];
   var ziv1 = new ZxImageView(options, imgArray1);
 
+  // 点击缩略图，查看大图
+  var $el = document.getElementById('imgList');
+  $el.addEventListener('click', function (e) {
+    if (this.nodeName === 'IMG') {
+      // 获取图片索引
+      var index = this.getAttribute('data-index');
+      // 查看图片
+      ziv1.view(index);
+    }
+  })
+
   // 使用方法2
   var imgArray2 = [
     {
       url: 'http://xxx.com/a.jpg',
-      // 默认选择角度
+      // 初始化旋转角度
       angle: 90
     },
     {
@@ -201,7 +212,7 @@ new ZxImageView(_config);
 |bracketRight| `](})` 键 |
 |semicolon| `;(:)` 键 |
 |quote| `'(")` 键 |
-|backslash| `\(|)` 键 |
+|backslash| `反斜线` 键 |
 |period| `,(>)` 键 |
 |comma| `.(<)` 键 |
 |slash| `/(?)` 键 |
