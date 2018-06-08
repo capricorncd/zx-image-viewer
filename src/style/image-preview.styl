@@ -88,9 +88,25 @@
     bottom 40px
     transform translateX(-50%)
     height 40px
-    background-color rgba(255, 255, 255, .5)
     ._item
+      position: relative;
       display: inline-block;
+      margin: 0 2px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      border-radius: 50%
+      background-color: rgba(255, 255, 255, .3);
+      box-sizing: border-box;
+      border: 1px solid rgba(255, 255, 255, .5);
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      &:hover
+        background-color: rgba(255, 255, 255, .5);
+      .zx
+        display: inline-block;
+        font-size: 18px;
   .zip-totalbar-wrapper
     position: absolute;
     z-index: 2;

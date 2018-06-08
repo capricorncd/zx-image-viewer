@@ -138,7 +138,7 @@ npm run start
 |showClose|Boolean|显示关闭预览窗口按钮，默认值`true`|
 |showPagination|Boolean|显示分页栏，默认值`true`|
 |showSwitchArrow|Boolean|显示左右切换箭头按钮，默认值`true`|
-|showToolbar|Boolean|显示工具栏，默认值`false`(待开发...)|
+|showToolbar|Boolean|显示工具栏，默认值`false`|
 
 #### options.keyboard
 

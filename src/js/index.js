@@ -41,7 +41,8 @@ const __DEFAULT = {
     // [Clockwise 顺时针, anticlockwise 逆时针]
     rotate: ['up', 'down'],
     close: 'escape'
-  }
+  },
+  iconfont: '//at.alicdn.com/t/font_613889_b33thi6xkj7cik9.css'
 }
 
 // const log = console.log
@@ -108,9 +109,77 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
+              class: '_item _enlarge-hook'
+            },
+            child: [
+              {
+                tag: 'i',
+                attrs: {
+                  class: 'zx zx-add _enlarge-hook',
+                  title: '放大'
+                }
+              }
+            ]
+          },
+          {
+            tag: 'span',
+            attrs: {
+              class: '_item _reduce-hook'
+            },
+            child: [
+              {
+                tag: 'i',
+                attrs: {
+                  class: 'zx zx-subtract _reduce-hook',
+                  title: '缩小'
+                }
+              }
+            ]
+          },
+          {
+            tag: 'span',
+            attrs: {
               class: '_item _rotate-hook'
             },
-            child: ['旋转']
+            child: [
+              {
+                tag: 'i',
+                attrs: {
+                  class: 'zx zx-refresh _rotate-hook',
+                  title: '旋转'
+                }
+              }
+            ]
+          },
+          {
+            tag: 'span',
+            attrs: {
+              class: '_item _prev-hook'
+            },
+            child: [
+              {
+                tag: 'i',
+                attrs: {
+                  class: 'zx zx-back _prev-hook',
+                  title: '上一张'
+                }
+              }
+            ]
+          },
+          {
+            tag: 'span',
+            attrs: {
+              class: '_item _next-hook'
+            },
+            child: [
+              {
+                tag: 'i',
+                attrs: {
+                  class: 'zx zx-more _next-hook',
+                  title: '下一张'
+                }
+              }
+            ]
           }
         ]
       })
@@ -145,6 +214,15 @@ class ZxImageView {
     this.index = 0
     // 事件处理器
     this._eventHandler()
+
+    const cssVnode = {
+      tag: 'link',
+      attrs: {
+        href: opts.iconfont,
+        rel: 'stylesheet'
+      }
+    }
+    dom.query('head').appendChild(dom.create(cssVnode))
   }
 
   // 初始化
@@ -278,14 +356,30 @@ class ZxImageView {
     this.$tool && this.$tool.addEventListener('click', e => {
       e.stopPropagation()
       const $el = e.target
-      let isToolItem = dom.hasClass($el, '_item')
+      console.log($el.className)
+      let isToolItem = dom.hasClass($el, '_item') || dom.hasClass($el, 'zx')
       if (!isToolItem) return
+      // 放大
+      if (dom.hasClass($el, '_enlarge-hook')) {
+        this._scale(1)
+      }
+      // 缩小
+      else if (dom.hasClass($el, '_reduce-hook')) {
+        this._scale(-1)
+      }
       // 旋转
-      if (dom.hasClass($el, '_rotate-hook')) {
+      else if (dom.hasClass($el, '_rotate-hook')) {
         this._rotate()
       }
-      // log($el.className)
-    })
+      // 上一张
+      else if (dom.hasClass($el, '_prev-hook')) {
+        this.prev()
+      }
+      // 下一张
+      else if (dom.hasClass($el, '_next-hook')) {
+        this.next()
+      }
+    }, true)
 
     // 点击统计栏
     this.$pagination && this.opts.paginationable && this.$pagination.addEventListener('mouseover', e => {
