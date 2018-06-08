@@ -12,6 +12,20 @@
 
 ## 使用 use
 
+npm
+
+```
+npm install zx-image-view --save-dev
+# 或
+npm i zx-image-view -D
+```
+
+ES6+
+
+```javascript
+import { ZxImageView } from 'zx-image-view'
+```
+
 浏览器Brower
 
 ```html
@@ -23,34 +37,20 @@
 </div>
 <script src="dist/js/zx-image-view.min.js"></script>
 <script>
-  // 获取图片容器dom元素
-  var $el = document.getElementById('imgList');
   // 初始化参数
   var options = {
     // 见参数说明处
   };
 
-  // 使用方法1
+  // 图片数组1
   var imgArray1 = [
     'http://xxx.com/a.jpg',
     'http://xxx.com/b.jpg',
     'http://xxx.com/c.jpg',
     'http://xxx.com/d.jpg'
   ];
-  var ziv1 = new ZxImageView(options, imgArray1);
 
-  // 点击缩略图，查看大图
-  var $el = document.getElementById('imgList');
-  $el.addEventListener('click', function (e) {
-    if (this.nodeName === 'IMG') {
-      // 获取图片索引
-      var index = this.getAttribute('data-index');
-      // 查看图片
-      ziv1.view(index);
-    }
-  })
-
-  // 使用方法2
+  // 图片数组2
   var imgArray2 = [
     {
       url: 'http://xxx.com/a.jpg',
@@ -70,25 +70,46 @@
       angle: 90
     }
   ];
-  var ziv2 = new ZxImageView(imgArray2);
-
-  // 使用方法3
-  var ziv3 = new ZxImageView();
-  ziv3.init(imgArray2);
 </script>
 ```
 
-npm
+使用方法 1
 
-```
-npm install zx-image-view --save-dev
-# 或
-npm i zx-image-view -D
-```
-
-ES6+
 ```javascript
-import { ZxImageView } from 'zx-image-view'
+var ziv1 = new ZxImageView(options, imgArray1);
+
+// 点击缩略图，查看大图
+var $el = document.getElementById('imgList');
+$el.addEventListener('click', function (e) {
+  if (this.nodeName === 'IMG') {
+    // 获取图片索引
+    var index = this.getAttribute('data-index');
+    // 查看图片
+    ziv1.view(index);
+  }
+})
+```
+
+使用方法 2
+
+```javascript
+var ziv2 = new ZxImageView(imgArray2);
+```
+
+使用方法 3
+
+```javascript
+var ziv3 = new ZxImageView();
+ziv3.init(imgArray2);
+```
+
+使用方法 4
+
+```javascript
+var ziv4 = new ZxImageView();
+// 业务场景，针对后台管理列表页，每天数据(动态)有多张图片，独立预览，不需要多次初始化ZxImageView实例
+// 查看imgArray2第3张图片
+ziv4.view(2, imgArray2);
 ```
 
 开发调试

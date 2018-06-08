@@ -17,7 +17,7 @@ const __DEFAULT = {
   // 背景遮罩透明度[0-1]
   // backgroundOpacity: .6,
   // 分页mouseover切换图片
-  paginationable: false,
+  paginationable: true,
   // 显示关闭按钮
   showClose: true,
   // 显示上一张/下一张箭头
@@ -156,13 +156,11 @@ class ZxImageView {
     let imgArray = fmtImageArray(images)
     if (imgArray) {
       this.images = imgArray
-    } else {
-      throw new Error(`图片数组images参数为空或格式不正确!`)
     }
     if (typeof index !== 'undefined') {
       this.index = index >= this.images.length ? 0 : util.int(index)
     }
-    this._resetImages()
+    this._resetPaginationInnerHtml()
     this._resetCurrent$img()
   }
 
@@ -174,14 +172,15 @@ class ZxImageView {
     this.init(images, 0)
   }
 
-  // 重置图片thumb列表数据
-  _resetImages () {
+  // 重置分页html结构
+  _resetPaginationInnerHtml () {
+    if (!this.$pagination) return
     let html = ''
     let len = this.images.length
     this.images.forEach((item, index) => {
       html += `<i style="width:${Math.floor(1 / len * 100)}%" data-index="${index}" class="_item${this.index === index ? ' _item-active' : ''}"></i>`
     })
-    if (this.$pagination) this.$pagination.innerHTML = html
+    this.$pagination.innerHTML = html
     this._checkArrowPrevNext()
   }
 
@@ -202,7 +201,11 @@ class ZxImageView {
     let imgArray = fmtImageArray(images)
     if (imgArray) {
       this.images = imgArray
-      this._resetImages()
+      this._resetPaginationInnerHtml()
+    }
+    // 图片数组是否有元素判断
+    if (this.images.length === 0) {
+      throw new Error(`图片数组images参数为空或格式不正确!`)
     }
     if (index < this.images.length) {
       this.index = util.int(index)
@@ -497,8 +500,8 @@ class ZxImageView {
   // 验证图片切换键是否显示
   _checkArrowPrevNext () {
     if (this.images.length <= 1) {
-      this.togglePrev()
-      this.toggleNext()
+      this.togglePrev('hide')
+      this.toggleNext('hide')
     }
   }
 
