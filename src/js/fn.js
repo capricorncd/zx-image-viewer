@@ -55,3 +55,25 @@ export function fmtImageArray (images) {
     return item.url ? images : null
   }
 }
+
+/**
+ * 添加图标字体样式至head
+ * @param dom
+ * @returns {boolean}
+ */
+export function appendIconfontToHead (dom, iconfontUrl) {
+  const cssVnode = {
+    tag: 'link',
+    attrs: {
+      href: iconfontUrl,
+      rel: 'stylesheet'
+    }
+  }
+
+  try {
+    dom.query('head').appendChild(dom.create(cssVnode))
+    return true
+  } catch (e) {
+    return false
+  }
+}

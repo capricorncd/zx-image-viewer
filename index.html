@@ -95,17 +95,23 @@
       // scale: ['equal', 'minus']
     }
   }
-  // 使用方法 2
-  var ziv2 = new ZxImageView(_config, imgs2);
-  console.log(ziv2);
+  // 使用方法
+  var ziv = new ZxImageView(_config, imgs2);
+  console.log(ziv);
   // 查看第几张
   var $images = $el.querySelectorAll('.item');
-  $images.forEach(function (item, index) {
-    // 点击央视为.item的元素时，显示图片查看器
-    item.addEventListener('click', function () {
-      ziv2.view(index);
-    })
-  })
+  for (var i = 0; i < $images.length; i++) {
+    (function (index) {
+      $images[i].addEventListener('click', function () {
+        ziv.view(index);
+      })
+    }(i))
+  }
+//  $images.forEach(function (item, index) {
+//    item.addEventListener('click', function () {
+//      ziv.view(index);
+//    })
+//  })
 </script>
 </body>
 </html>

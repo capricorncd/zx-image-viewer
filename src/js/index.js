@@ -8,7 +8,7 @@ import util from './util'
 import dom from './dom'
 import ic from './img-controls'
 import keyboard from "./keyboard"
-import { mouseWheel, filterOptions, fmtImageArray } from './fn'
+import { mouseWheel, filterOptions, fmtImageArray, appendIconfontToHead } from './fn'
 
 // window.util = util
 
@@ -42,7 +42,8 @@ const __DEFAULT = {
     rotate: ['up', 'down'],
     close: 'escape'
   },
-  iconfont: '//at.alicdn.com/t/font_613889_b33thi6xkj7cik9.css'
+  // 图标字体
+  iconfont: '//at.alicdn.com/t/font_613889_qd2ugx65fxadzpvi.css'
 }
 
 // const log = console.log
@@ -109,13 +110,13 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
-              class: '_item _enlarge-hook'
+              class: '_item'
             },
             child: [
               {
                 tag: 'i',
                 attrs: {
-                  class: 'zx zx-add _enlarge-hook',
+                  class: 'zx zx-enlarge',
                   title: '放大'
                 }
               }
@@ -124,13 +125,13 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
-              class: '_item _reduce-hook'
+              class: '_item'
             },
             child: [
               {
                 tag: 'i',
                 attrs: {
-                  class: 'zx zx-subtract _reduce-hook',
+                  class: 'zx zx-reduce',
                   title: '缩小'
                 }
               }
@@ -139,13 +140,13 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
-              class: '_item _rotate-hook'
+              class: '_item'
             },
             child: [
               {
                 tag: 'i',
                 attrs: {
-                  class: 'zx zx-refresh _rotate-hook',
+                  class: 'zx zx-rotate',
                   title: '旋转'
                 }
               }
@@ -154,13 +155,13 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
-              class: '_item _prev-hook'
+              class: '_item'
             },
             child: [
               {
                 tag: 'i',
                 attrs: {
-                  class: 'zx zx-back _prev-hook',
+                  class: 'zx zx-prev',
                   title: '上一张'
                 }
               }
@@ -169,13 +170,13 @@ class ZxImageView {
           {
             tag: 'span',
             attrs: {
-              class: '_item _next-hook'
+              class: '_item'
             },
             child: [
               {
                 tag: 'i',
                 attrs: {
-                  class: 'zx zx-more _next-hook',
+                  class: 'zx zx-next',
                   title: '下一张'
                 }
               }
@@ -184,7 +185,7 @@ class ZxImageView {
         ]
       })
     }
-    // 数量、统计栏
+    // 分页栏
     if (opts.showPagination) {
       vnode.child.push({tag: 'div', attrs: {class: 'zip-pagination-wrapper'}})
     }
@@ -214,15 +215,8 @@ class ZxImageView {
     this.index = 0
     // 事件处理器
     this._eventHandler()
-
-    const cssVnode = {
-      tag: 'link',
-      attrs: {
-        href: opts.iconfont,
-        rel: 'stylesheet'
-      }
-    }
-    dom.query('head').appendChild(dom.create(cssVnode))
+    // 添加图标字体样式至head
+    appendIconfontToHead(dom, opts.iconfont)
   }
 
   // 初始化
@@ -356,28 +350,28 @@ class ZxImageView {
     this.$tool && this.$tool.addEventListener('click', e => {
       e.stopPropagation()
       const $el = e.target
-      console.log($el.className)
-      let isToolItem = dom.hasClass($el, '_item') || dom.hasClass($el, 'zx')
-      if (!isToolItem) return
-      // 放大
-      if (dom.hasClass($el, '_enlarge-hook')) {
-        this._scale(1)
-      }
-      // 缩小
-      else if (dom.hasClass($el, '_reduce-hook')) {
-        this._scale(-1)
-      }
-      // 旋转
-      else if (dom.hasClass($el, '_rotate-hook')) {
-        this._rotate()
-      }
+      // console.log($el.className)
+      // let isToolItem = dom.hasClass($el, 'zx')
+      // if (!isToolItem) return
       // 上一张
-      else if (dom.hasClass($el, '_prev-hook')) {
+      if (dom.hasClass($el, 'zx-prev')) {
         this.prev()
       }
       // 下一张
-      else if (dom.hasClass($el, '_next-hook')) {
+      else if (dom.hasClass($el, 'zx-next')) {
         this.next()
+      }
+      // 放大
+      else if (dom.hasClass($el, 'zx-enlarge')) {
+        this._scale(1)
+      }
+      // 缩小
+      else if (dom.hasClass($el, 'zx-reduce')) {
+        this._scale(-1)
+      }
+      // 旋转
+      else if (dom.hasClass($el, 'zx-rotate')) {
+        this._rotate()
       }
     }, true)
 

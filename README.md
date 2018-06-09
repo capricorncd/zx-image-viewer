@@ -132,6 +132,7 @@ npm run start
 |参数|类型|说明|
 |:--|:--|:--|
 |backgroundOpacity|Floor|背景遮罩(黑色)透明度，取值`0-1`，默认值`0.6`|
+|iconfont|String|iconfont图标字体css样式url地址(样式名见附录iconfont说明)|
 |keyboard|Object|键盘按钮(前/后一张、缩放、旋转、关闭)配置|
 |paginationable|Boolean|分页mouseover切换图片，默认值`true`|
 |movable|Boolean|移动图片，默认值`true`|
@@ -211,7 +212,15 @@ new ZxImageView(_config);
 
 ## 附录
 
-支持自定义键盘按钮名/keyboard参数可选属性
+* iconfont样式名说明
+
+字体样式`.zx`，图标样式如下图：
+
+![zx-image-view iconfont](resource/iconfont.png)
+
+http://www.iconfont.cn/
+
+* 支持自定义键盘按钮名/keyboard参数可选属性
 
 |属性|键名/说明|
 |:--|:--|
