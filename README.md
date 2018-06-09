@@ -10,6 +10,8 @@
 
 > 滚动鼠标：缩放
 
+注：支持自定义按键配置，详见参数说明。
+
 ## 使用 use
 
 npm
@@ -107,7 +109,7 @@ ziv3.init(imgArray2);
 
 ```javascript
 var ziv4 = new ZxImageView();
-// 业务场景，针对后台管理列表页，每天数据(动态)有多张图片，独立预览，不需要多次初始化ZxImageView实例
+// 业务场景，针对后台管理列表页，每条数据(动态)有多张图片，需独立预览，不需要多次实例化ZxImageView
 // 查看imgArray2第3张图片
 ziv4.view(2, imgArray2);
 ```
