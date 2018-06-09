@@ -134,8 +134,8 @@ npm run start
 |backgroundOpacity|Floor|背景遮罩(黑色)透明度，取值`0-1`，默认值`0.6`|
 |iconfont|String|iconfont图标字体css样式url地址(样式名见附录iconfont说明)|
 |keyboard|Object|键盘按钮(前/后一张、缩放、旋转、关闭)配置|
-|paginationable|Boolean|分页mouseover切换图片，默认值`true`|
 |movable|Boolean|移动图片，默认值`true`|
+|paginationable|Boolean|分页mouseover切换图片，默认值`true`|
 |rotatable|Boolean|旋转图片，默认值`true`|
 |scalable|Boolean|缩放图片，默认值`true`|
 |showClose|Boolean|显示关闭预览窗口按钮，默认值`true`|
@@ -147,11 +147,11 @@ npm run start
 
 |参数|类型|可选键名|说明|
 |:--|:--|:--|:--|
-|prev|String|任意键或`mousewheel`|上一张；为`mousewheel`时，next无效|
-|next|String|任意键|下一张|
-|scale|String或Array|任意键或`mousewheel`|图片缩放|
-|rotate|String或Array|任意键或`mousewheel`|图片旋转|
 |close|String|关闭图片查看器|
+|next|String|任意键|下一张|
+|prev|String|任意键或`mousewheel`|上一张；为`mousewheel`时，next无效|
+|rotate|String或Array|任意键或`mousewheel`|图片旋转|
+|scale|String或Array|任意键或`mousewheel`|图片缩放|
 
 注意：参数中只能包含有且一个`mousewheel`配置；任何配置均不支持组合键。
 
@@ -195,12 +195,6 @@ new ZxImageView(_config);
 |:--|:--|:--|:--|
 |imageArray|Array|是|图片url数组|
 |index|Number|否|imageArray的索引，默认显示的第`index + 1`张图片；默认为`0`; 如果`index > imageArray.length`将被忽略|
-
-* update(imageArray) 更新图片数据；与`init()`基本相同
-
-|参数|类型|必须|说明|
-|:--|:--|:--|:--|
-|imageArray|Array|是|图片url数组|
 
 * view(index, angle, imageArray) 查看第`index + 1`张图片
 
