@@ -186,7 +186,7 @@ class ZxImageView {
     }
     // 数量、统计栏
     if (opts.showPagination) {
-      vnode.child.push({tag: 'div', attrs: {class: 'zip-totalbar-wrapper'}})
+      vnode.child.push({tag: 'div', attrs: {class: 'zip-pagination-wrapper'}})
     }
 
     // 创建dom结构
@@ -199,7 +199,7 @@ class ZxImageView {
     // 工具栏
     this.$tool = dom.query('.zip-tool-wrapper', this.$container)
     // 分页栏
-    this.$pagination = dom.query('.zip-totalbar-wrapper', this.$container)
+    this.$pagination = dom.query('.zip-pagination-wrapper', this.$container)
 
     // 背景透明度
     if (typeof opts.backgroundOpacity !== 'undefined') {
