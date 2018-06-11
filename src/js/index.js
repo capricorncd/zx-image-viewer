@@ -587,6 +587,9 @@ class ZxImageView {
 
   // 验证图片切换键是否显示
   _checkArrowPrevNext () {
+    // 不显示左右箭头
+    if (!this.opts.showSwitchArrow) return
+    // 图片数组只有一张或为空
     if (this.images.length <= 1) {
       this.togglePrev('hide')
       this.toggleNext('hide')
@@ -595,12 +598,12 @@ class ZxImageView {
 
   togglePrev (type) {
     const $el = dom.query('._prev-arrow', this.$container)
-    $el.style.display = type === 'show' ? 'block' : 'none'
+    if ($el) $el.style.display = type === 'show' ? 'block' : 'none'
   }
 
   toggleNext (type) {
     const $el = dom.query('._next-arrow', this.$container)
-    $el.style.display = type === 'show' ? 'block' : 'none'
+    if ($el) $el.style.display = type === 'show' ? 'block' : 'none'
   }
 }
 

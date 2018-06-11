@@ -127,6 +127,8 @@ npm run start
 
 ![image-view](resource/view-2.jpg)
 
+![image-view](resource/mobile.jpg)
+
 ## 参数 options
 
 |参数|类型|说明|
