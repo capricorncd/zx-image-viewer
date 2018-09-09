@@ -10,7 +10,8 @@ import { touchEvents } from './touch-event'
 // 缩小最小尺寸限制
 const MIN_SIZE = 60
 const win = new WinSize()
-const boundary = 50
+// 边界限制，屏幕宽度的30%
+const boundary = win.width * 0.3
 // 禁止图片被选中
 document.onselectstart = new Function('event.returnValue=false')
 export default {
@@ -122,7 +123,6 @@ export default {
       halfImgSizeDifference = Math.abs(imgPos.width - imgPos.height) / 2
       // 竖图
       isVerticalImage = $img.width < $img.height
-      console.log($img.width, $img.height)
     })
 
     let l, t
