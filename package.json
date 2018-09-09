@@ -1,6 +1,6 @@
 {
   "name": "zx-image-view",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "Image view plugin",
   "author": "zx1984",
   "repository": {
@@ -15,9 +15,8 @@
     "preview"
   ],
   "scripts": {
-    "start": "webpack-dev-server --color --inline --config build/webpack.dev.js",
-    "dev": "webpack --color --config build/webpack.dev.js",
-    "build": "npm run dev && webpack --color --config build/webpack.prod.js"
+    "dev": "webpack-dev-server --color --inline --config build/webpack.dev.js",
+    "build": "webpack --color --process --config build/webpack.prod.js"
   },
   "dependencies": {
     "webpack": "^4.8.1",

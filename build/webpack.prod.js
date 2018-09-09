@@ -3,12 +3,16 @@
  * https://github.com/zx1984
  */
 const merge = require('webpack-merge')
+const webpack = require('webpack')
 const baseConfig = require('./webpack.base')
+const banner = require('./banner')
 
 module.exports = merge(baseConfig, {
   mode: 'production',
   output: {
     filename: 'js/[name].min.js'
   },
-  plugins: []
+  plugins: [
+    new webpack.BannerPlugin(banner)
+  ]
 })

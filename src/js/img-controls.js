@@ -5,7 +5,14 @@
  */
 import util from './util'
 import dom from './dom'
+import WinSize from './window-size'
+import { touchEvents } from './touch-event'
+// 缩小最小尺寸限制
 const MIN_SIZE = 60
+const win = new WinSize()
+const boundary = 50
+// 禁止图片被选中
+document.onselectstart = new Function('event.returnValue=false')
 export default {
   /**
    * 缩放
@@ -64,34 +71,115 @@ export default {
   move ($img) {
     // 鼠标在图片上按下
     let isMousedownOnImage = false
+    // isTouchEvent
+    let isTouchEvent = false
     // 鼠标按下位置图片左上角位置
     let moveBeforePostion = {}
+    // 图片是否旋转
+    let isRotate = false
+    // 图片宽高差
+    let halfImgSizeDifference = 0
+    // 竖图
+    let isVerticalImage = false
     // 开始
-    $img.addEventListener('mousedown', e => {
+    $img.addEventListener(touchEvents.start, e => {
       // log(e.type)
       // 防止触发浏览器图片拖动行为
       e.preventDefault()
       isMousedownOnImage = true
-      moveBeforePostion.x = e.clientX - $img.offsetLeft
-      moveBeforePostion.y = e.clientY - $img.offsetTop
-      dom.rmClass($img, 'v-transition')
+
+      isTouchEvent = e.type === 'touchstart'
+
+      // prevent user enter with right and the swiper move (needs isTouchEvent)
+      if (!isTouchEvent && 'which' in e && e.which === 3) {
+        isMousedownOnImage = false
+        return
+      }
+
+      if (!isTouchEvent || e.targetTouches.length === 1) {
+        if (!isTouchEvent && !util.isAndroid()) {
+          if (e.preventDefault) {
+            e.preventDefault()
+          } else {
+            e.returnValue = false
+          }
+        }
+
+        let pageX = isTouchEvent ? e.targetTouches[0].pageX : (e.pageX || e.clientX)
+        let pageY = isTouchEvent ? e.targetTouches[0].pageY : (e.pageY || e.clientY)
+
+        moveBeforePostion.x = pageX - $img.offsetLeft
+        moveBeforePostion.y = pageY - $img.offsetTop
+        dom.rmClass($img, 'v-transition')
+      }
+      // 是否旋转
+      let angle = $img.getAttribute('rotate-angle')
+      if (/^(\d+)/.test(angle)) {
+        isRotate = RegExp.$1 / 90 % 2 === 1
+      }
+      // 图片宽高差
+      let imgPos = $img.getBoundingClientRect()
+      halfImgSizeDifference = Math.abs(imgPos.width - imgPos.height) / 2
+      // 竖图
+      isVerticalImage = $img.width < $img.height
+      console.log($img.width, $img.height)
     })
 
     let l, t
     // 拖动
-    document.addEventListener('mousemove', e => {
+    document.addEventListener(touchEvents.move, e => {
       if (!isMousedownOnImage) return
-      e.preventDefault()
+      if (!isTouchEvent && !util.isAndroid()) {
+        if (e.preventDefault) {
+          e.preventDefault()
+        } else {
+          e.returnValue = false
+        }
+      }
 
-      l = e.clientX - moveBeforePostion.x
-      t = e.clientY - moveBeforePostion.y
+      let pageX = isTouchEvent ? e.targetTouches[0].pageX : (e.pageX || e.clientX)
+      let pageY = isTouchEvent ? e.targetTouches[0].pageY : (e.pageY || e.clientY)
+
+      l = pageX - moveBeforePostion.x
+      t = pageY - moveBeforePostion.y
+      // ie11 无x/y属性
+      let imgPos = $img.getBoundingClientRect()
+      // Boundary restriction
+      // Right boundary
+      let rightBoundary = isRotate
+        ? (isVerticalImage ? win.width + halfImgSizeDifference - boundary : win.width - halfImgSizeDifference - boundary)
+        : win.width - boundary
+      if (rightBoundary <= l) {
+        l = rightBoundary
+      }
+      // Left boundary
+      let leftBoundary = isRotate
+        ? (isVerticalImage ? boundary - imgPos.width + halfImgSizeDifference : boundary - imgPos.width - halfImgSizeDifference)
+        : boundary - imgPos.width
+      if (l <= leftBoundary) {
+        l = leftBoundary
+      }
+      // Bottom boundary
+      let bottomBoundary = isRotate
+        ? (isVerticalImage ? win.height - halfImgSizeDifference - boundary : win.height + halfImgSizeDifference - boundary)
+        : win.height - boundary
+      if (bottomBoundary <= t) {
+        t = bottomBoundary
+      }
+      // Top boundary
+      let topBoundary = isRotate
+        ? (isVerticalImage ? boundary - imgPos.height - halfImgSizeDifference : boundary - imgPos.height + halfImgSizeDifference)
+        : boundary - imgPos.height
+      if (t <= topBoundary) {
+        t = topBoundary
+      }
 
       $img.style.left = l + 'px'
       $img.style.top = t + 'px'
     })
 
     // 释放鼠标
-    document.addEventListener('mouseup', e => {
+    document.addEventListener(touchEvents.end, e => {
       isMousedownOnImage = false
       dom.addClass($img, 'v-transition')
     })

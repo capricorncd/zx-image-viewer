@@ -115,8 +115,8 @@ export default {
    * @returns {Array} 获取到的样式名数组
    */
   _className ($el, cls) {
-    var result = []
-    var cn = $el.className
+    let result = []
+    let cn = $el.className
     if (cn) {
       let arr, i, val
       arr = util.trim(cn).split(' ')

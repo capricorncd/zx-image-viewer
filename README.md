@@ -117,7 +117,7 @@ ziv4.view(2, imgArray2);
 开发调试
 
 ```
-npm run start
+npm run dev
 # http://localhost:9000/
 ```
 
