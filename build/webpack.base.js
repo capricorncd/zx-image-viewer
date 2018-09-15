@@ -1,6 +1,6 @@
 /**
- * Created by zx1984 5/10/2018
- * https://github.com/zx1984
+ * Created by capricorncd 5/10/2018
+ * https://github.com/capricorncd
  */
 const path = require('path')
 // const webpack = require('webpack')

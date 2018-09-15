@@ -279,4 +279,4 @@ http://www.iconfont.cn/
 
 ## Copyright and license
 
-Code and documentation copyright 2018. zx1984. Code released under the MIT License.
+Code and documentation copyright 2018. capricorncd. Code released under the MIT License.

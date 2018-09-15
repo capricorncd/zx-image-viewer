@@ -1,7 +1,7 @@
 /**
- * Create by zx1984
+ * Create by capricorncd
  * 2018/5/16 0016.
- * https://github.com/zx1984
+ * https://github.com/capricorncd
  */
 import util from './util'
 import dom from './dom'
