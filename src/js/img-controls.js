@@ -7,6 +7,7 @@ import util from './util'
 import dom from './dom'
 import WinSize from './window-size'
 import { touchEvents } from './touch-event'
+import { getTouches, handleTouches } from './touch-zoom'
 // 缩小最小尺寸限制
 const MIN_SIZE = 60
 const win = new WinSize()
@@ -20,31 +21,32 @@ export default {
    * @param $img 缩放对象
    * @param wheelDelta > 0放大或 < 0缩小
    */
-  scale ($img, wheelDelta) {
+  scale ($img, wheelDelta, isTouches) {
+    let scaleRatio = isTouches ? 0.02 : 0.4
     if (wheelDelta > 0) {
       // 放大
-      this._scaleHandler($img, true)
+      this._scaleHandler($img, true, scaleRatio)
     } else {
       // 缩小
-      this._scaleHandler($img)
+      this._scaleHandler($img, false, scaleRatio)
     }
   },
 
   // @param isEnlarge 是否放大
-  _scaleHandler ($img, isEnlarge) {
+  _scaleHandler ($img, isEnlarge, scaleRatio) {
     let naturalWidth = $img.naturalWidth
     // let naturalHeight = $img.naturalHeight
     let imgWidth = $img.width
     let imgHeight = $img.height
     let iw, ih
     if (isEnlarge) {
-      iw = imgWidth * 1.4
+      iw = imgWidth * (1 + scaleRatio)
       // 最大放大2倍
       if (iw >= naturalWidth * 3) return
     } else {
       // 图片实际尺寸小于最小限制尺寸
       if (naturalWidth < MIN_SIZE) return
-      iw = imgWidth * 0.6
+      iw = imgWidth * (1 - scaleRatio)
       if (iw <= MIN_SIZE) return
     }
     ih = iw * imgHeight / imgWidth
@@ -82,6 +84,9 @@ export default {
     let halfImgSizeDifference = 0
     // 竖图
     let isVerticalImage = false
+    // 手指数量
+    let fingers = 0
+    let startTouches = []
     // 开始
     $img.addEventListener(touchEvents.start, e => {
       // log(e.type)
@@ -90,6 +95,14 @@ export default {
       isMousedownOnImage = true
 
       isTouchEvent = e.type === 'touchstart'
+
+      if (isTouchEvent) {
+        fingers = e.touches.length
+      }
+
+      if (fingers > 1) {
+        startTouches = getTouches(e, $img)
+      }
 
       // prevent user enter with right and the swiper move (needs isTouchEvent)
       if (!isTouchEvent && 'which' in e && e.which === 3) {
@@ -125,7 +138,6 @@ export default {
       isVerticalImage = $img.width < $img.height
     })
 
-    let l, t
     // 拖动
     document.addEventListener(touchEvents.move, e => {
       if (!isMousedownOnImage) return
@@ -137,45 +149,12 @@ export default {
         }
       }
 
-      let pageX = isTouchEvent ? e.targetTouches[0].pageX : (e.pageX || e.clientX)
-      let pageY = isTouchEvent ? e.targetTouches[0].pageY : (e.pageY || e.clientY)
-
-      l = pageX - moveBeforePostion.x
-      t = pageY - moveBeforePostion.y
-      // ie11 无x/y属性
-      let imgPos = $img.getBoundingClientRect()
-      // Boundary restriction
-      // Right boundary
-      let rightBoundary = isRotate
-        ? (isVerticalImage ? win.width + halfImgSizeDifference - boundary : win.width - halfImgSizeDifference - boundary)
-        : win.width - boundary
-      if (rightBoundary <= l) {
-        l = rightBoundary
+      if (fingers > 1) {
+        let scale = handleTouches(e, startTouches)
+        this._scaleHandler($img, scale > 1, 0.04)
+      } else {
+        handleMove(e, $img, moveBeforePostion, isTouchEvent, isRotate, isVerticalImage, halfImgSizeDifference)
       }
-      // Left boundary
-      let leftBoundary = isRotate
-        ? (isVerticalImage ? boundary - imgPos.width + halfImgSizeDifference : boundary - imgPos.width - halfImgSizeDifference)
-        : boundary - imgPos.width
-      if (l <= leftBoundary) {
-        l = leftBoundary
-      }
-      // Bottom boundary
-      let bottomBoundary = isRotate
-        ? (isVerticalImage ? win.height - halfImgSizeDifference - boundary : win.height + halfImgSizeDifference - boundary)
-        : win.height - boundary
-      if (bottomBoundary <= t) {
-        t = bottomBoundary
-      }
-      // Top boundary
-      let topBoundary = isRotate
-        ? (isVerticalImage ? boundary - imgPos.height - halfImgSizeDifference : boundary - imgPos.height + halfImgSizeDifference)
-        : boundary - imgPos.height
-      if (t <= topBoundary) {
-        t = topBoundary
-      }
-
-      $img.style.left = l + 'px'
-      $img.style.top = t + 'px'
     })
 
     // 释放鼠标
@@ -235,4 +214,46 @@ export default {
     // console.log(iw, ih)
     // console.log(imgRatio, winRatio)
   }
+}
+
+function handleMove (e, $img, moveBeforePostion, isTouchEvent, isRotate, isVerticalImage, halfImgSizeDifference) {
+  let pageX = isTouchEvent ? e.targetTouches[0].pageX : (e.pageX || e.clientX)
+  let pageY = isTouchEvent ? e.targetTouches[0].pageY : (e.pageY || e.clientY)
+
+  let l = pageX - moveBeforePostion.x
+  let t = pageY - moveBeforePostion.y
+  // ie11 无x/y属性
+  let imgPos = $img.getBoundingClientRect()
+  // Boundary restriction
+  // Right boundary
+  let rightBoundary = isRotate
+    ? (isVerticalImage ? win.width + halfImgSizeDifference - boundary : win.width - halfImgSizeDifference - boundary)
+    : win.width - boundary
+  if (rightBoundary <= l) {
+    l = rightBoundary
+  }
+  // Left boundary
+  let leftBoundary = isRotate
+    ? (isVerticalImage ? boundary - imgPos.width + halfImgSizeDifference : boundary - imgPos.width - halfImgSizeDifference)
+    : boundary - imgPos.width
+  if (l <= leftBoundary) {
+    l = leftBoundary
+  }
+  // Bottom boundary
+  let bottomBoundary = isRotate
+    ? (isVerticalImage ? win.height - halfImgSizeDifference - boundary : win.height + halfImgSizeDifference - boundary)
+    : win.height - boundary
+  if (bottomBoundary <= t) {
+    t = bottomBoundary
+  }
+  // Top boundary
+  let topBoundary = isRotate
+    ? (isVerticalImage ? boundary - imgPos.height - halfImgSizeDifference : boundary - imgPos.height + halfImgSizeDifference)
+    : boundary - imgPos.height
+  if (t <= topBoundary) {
+    t = topBoundary
+  }
+
+  $img.style.left = l + 'px'
+  $img.style.top = t + 'px'
 }
