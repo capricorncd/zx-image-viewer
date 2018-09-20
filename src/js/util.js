@@ -52,7 +52,7 @@ export default {
     for (let i = 0; i < els.length; i++) {
       el = els[i]
       if (el.nodeType !== 1) continue
-      css = this.getStyleValue(el)
+      css = this.getStyleValue(el) || {}
       if (css.position !== 'static') {
         zindex = this.toNumber(css.zIndex)
         if (zindex > 0) arr.push(zindex)

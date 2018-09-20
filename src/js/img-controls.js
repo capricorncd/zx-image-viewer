@@ -13,8 +13,7 @@ const MIN_SIZE = 60
 const win = new WinSize()
 // 边界限制，屏幕宽度的30%
 const boundary = win.width * 0.3
-// 禁止图片被选中
-document.onselectstart = new Function('event.returnValue=false')
+
 export default {
   /**
    * 缩放

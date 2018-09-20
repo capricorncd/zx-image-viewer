@@ -316,6 +316,11 @@ class ZxImageView {
    * @private
    */
   _eventHandler () {
+    // 禁止图片被选中
+    this.$container.addEventListener('selectstart', e => {
+      e.preventDefault()
+    })
+    // document.onselectstart = new Function('event.returnValue=false')
     // 关闭
     this.$close && this.$close.addEventListener('click', e => {
       e.stopPropagation()
