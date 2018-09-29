@@ -303,12 +303,23 @@ class ZxImageView {
    */
   _resetCurrent$img (_angle) {
     let item = this.images[this.index]
-    this.$img.src = item.url
+    const _this = this
+    const $img = this.$img
+    $img.src = item.url
     // 获取设置的图片旋转角度
     let angle = util.int(_angle || item.angle)
     // 根据缩略图设置的旋转角度，重置预览图片的旋转角度
-    dom.attr(this.$img, 'rotate-angle', angle)
-    ic.rotate(this.$img, angle)
+    dom.attr($img, 'rotate-angle', angle)
+    $img.onload = function () {
+      // 旋转和计算$img位置
+      ic.rotate($img, angle)
+      // 移除on-error样式
+      dom.rmClass(_this.$container, 'on-error')
+    }
+    $img.onerror = function () {
+      // 添加on-error样式
+      dom.addClass(_this.$container, 'on-error')
+    }
   }
 
   /**

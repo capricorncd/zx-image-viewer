@@ -11,6 +11,23 @@
   height 100%
   background-color rgba(0, 0, 0, .6)
   // text-align center
+  &.on-error
+    &:after
+      content: '! 图片加载失败'
+      position absolute
+      z-index 1
+      top: 50%;
+      left: 50%;
+      margin: -100px 0 0 -100px;
+      width: 200px;
+      height: 200px;
+      border: 1px solid #f1f1f1;
+      background-color: #eee;
+      color: #666;
+      text-align: center;
+      line-height: 200px;
+    img
+      display: none;
   ._cur
     cursor pointer
   .zip-close
