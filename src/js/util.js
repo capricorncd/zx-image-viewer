@@ -105,7 +105,7 @@ export default {
    * @returns {boolean}
    */
   isArray (arr) {
-    return arr && arr instanceof Array
+    return Array.isArray(arr)
   },
 
   /**
