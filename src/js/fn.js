@@ -2,7 +2,6 @@
  * Created by capricorncd 6/3/2018
  * https://github.com/capricorncd
  */
-'use strict';
 import util from './util'
 
 /**

@@ -7,7 +7,8 @@ import '../style/image-preview.styl'
 import util from './util'
 import dom from './dom'
 import ic from './img-controls'
-import keyboard from "./keyboard"
+import keyboard from './keyboard'
+import broadcast from './broadcast'
 import { mouseWheel, filterOptions, fmtImageArray, appendIconfontToHead } from './fn'
 
 // window.util = util
@@ -58,6 +59,8 @@ class ZxImageView {
     }
     // 初始化参数
     let options = util.isObject(opts) ? util.assign(__DEFAULT, opts) : __DEFAULT
+    // broadcast
+    this.broadcast = broadcast.broadcast
     // 判断键名配置是否有重复的
     this.opts = filterOptions(options)
     // 图片数组
@@ -522,6 +525,7 @@ class ZxImageView {
   // 隐藏图片预览
   hide () {
     if (this.$container) {
+      broadcast.emit('close')
       this.$container.style.display = 'none'
       this.isPreview = false
     }
@@ -534,6 +538,7 @@ class ZxImageView {
       if (zIndex > Z_INDEX) {
         this.$container.style.zIndex = zIndex
       }
+      broadcast.emit('show')
       this.$container.style.display = 'block'
       this.isPreview = true
     }
@@ -622,5 +627,9 @@ class ZxImageView {
     if ($el) $el.style.display = type === 'show' ? 'block' : 'none'
   }
 }
+
+ZxImageView.prototype.on = broadcast.on
+ZxImageView.prototype.off = broadcast.off
+ZxImageView.prototype.emit = broadcast.emit
 
 export { ZxImageView }
