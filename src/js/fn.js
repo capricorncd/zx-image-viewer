@@ -76,3 +76,92 @@ export function appendIconfontToHead (dom, iconfontUrl) {
     return false
   }
 }
+
+const BUTTONS_VNODE = {
+  enlarge: {
+    tag: 'span',
+    attrs: {
+      class: '_item'
+    },
+    child: [
+      {
+        tag: 'i',
+        attrs: {
+          class: 'zx zx-enlarge',
+          title: '放大'
+        }
+      }
+    ]
+  },
+  reduce: {
+    tag: 'span',
+    attrs: {
+      class: '_item'
+    },
+    child: [
+      {
+        tag: 'i',
+        attrs: {
+          class: 'zx zx-reduce',
+          title: '缩小'
+        }
+      }
+    ]
+  },
+  rotate: {
+    tag: 'span',
+    attrs: {
+      class: '_item'
+    },
+    child: [
+      {
+        tag: 'i',
+        attrs: {
+          class: 'zx zx-rotate',
+          title: '旋转'
+        }
+      }
+    ]
+  },
+  prev: {
+    tag: 'span',
+    attrs: {
+      class: '_item'
+    },
+    child: [
+      {
+        tag: 'i',
+        attrs: {
+          class: 'zx zx-prev',
+          title: '上一张'
+        }
+      }
+    ]
+  },
+  next: {
+    tag: 'span',
+    attrs: {
+      class: '_item'
+    },
+    child: [
+      {
+        tag: 'i',
+        attrs: {
+          class: 'zx zx-next',
+          title: '下一张'
+        }
+      }
+    ]
+  }
+}
+
+/**
+ * 创建工具栏按钮vnode
+ * @param buttons
+ * @returns {*}
+ */
+export function createToolbarButtons (buttons) {
+  // map 根据配置，生成buttonvnode
+  // filter 过滤掉item为undefined的元素，及BUTTONS[name]不存在的数据
+  return Array.isArray(buttons) ? buttons.map(name => BUTTONS_VNODE[name]).filter(item => item) : []
+}

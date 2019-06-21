@@ -144,6 +144,7 @@ npm run dev
 |showPagination|Boolean|显示分页栏，默认值`true`|
 |showSwitchArrow|Boolean|显示左右切换箭头按钮，默认值`true`|
 |showToolbar|Boolean|显示工具栏，默认值`false`|
+|toolbarButtons|Array|工具栏按钮数量及顺序配置，可选值/默认值`['prev', 'enlarge', 'rotate', 'reduce', 'next']`|
 
 #### options.keyboard
 

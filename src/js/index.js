@@ -9,7 +9,13 @@ import dom from './dom'
 import ic from './img-controls'
 import keyboard from './keyboard'
 import broadcast from './broadcast'
-import { mouseWheel, filterOptions, fmtImageArray, appendIconfontToHead } from './fn'
+import {
+  mouseWheel,
+  filterOptions,
+  fmtImageArray,
+  appendIconfontToHead,
+  createToolbarButtons
+} from './fn'
 
 // window.util = util
 
@@ -44,7 +50,9 @@ const __DEFAULT = {
     close: 'escape'
   },
   // 图标字体
-  iconfont: '//at.alicdn.com/t/font_613889_qd2ugx65fxadzpvi.css'
+  iconfont: '//at.alicdn.com/t/font_613889_qd2ugx65fxadzpvi.css',
+  // 工具栏按钮数量及顺序配置
+  toolbarButtons: ['prev', 'enlarge', 'rotate', 'reduce', 'next']
 }
 
 // const log = console.log
@@ -104,88 +112,13 @@ class ZxImageView {
     }
     // 工具栏
     if (opts.showToolbar) {
+
       vnode.child.push({
         tag: 'div',
         attrs: {
           class: 'zip-tool-wrapper'
-        },
-        child: [
-          {
-            tag: 'span',
-            attrs: {
-              class: '_item'
-            },
-            child: [
-              {
-                tag: 'i',
-                attrs: {
-                  class: 'zx zx-enlarge',
-                  title: '放大'
-                }
-              }
-            ]
-          },
-          {
-            tag: 'span',
-            attrs: {
-              class: '_item'
-            },
-            child: [
-              {
-                tag: 'i',
-                attrs: {
-                  class: 'zx zx-reduce',
-                  title: '缩小'
-                }
-              }
-            ]
-          },
-          {
-            tag: 'span',
-            attrs: {
-              class: '_item'
-            },
-            child: [
-              {
-                tag: 'i',
-                attrs: {
-                  class: 'zx zx-rotate',
-                  title: '旋转'
-                }
-              }
-            ]
-          },
-          {
-            tag: 'span',
-            attrs: {
-              class: '_item'
-            },
-            child: [
-              {
-                tag: 'i',
-                attrs: {
-                  class: 'zx zx-prev',
-                  title: '上一张'
-                }
-              }
-            ]
-          },
-          {
-            tag: 'span',
-            attrs: {
-              class: '_item'
-            },
-            child: [
-              {
-                tag: 'i',
-                attrs: {
-                  class: 'zx zx-next',
-                  title: '下一张'
-                }
-              }
-            ]
-          }
-        ]
+        }
+        // child: createToolbarButtons(opts.toolbarButtons)
       })
     }
     // 分页栏
@@ -235,6 +168,7 @@ class ZxImageView {
     if (typeof index !== 'undefined') {
       this.index = index >= this.images.length ? 0 : util.int(index)
     }
+    this._updateToolbar()
     this._resetPaginationInnerHtml()
     this._resetCurrent$img()
   }
@@ -277,6 +211,7 @@ class ZxImageView {
     if (imgArray) {
       this.images = imgArray
       this._resetPaginationInnerHtml()
+      this._updateToolbar()
     }
     // 图片数组是否有元素判断
     if (this.images.length === 0) {
@@ -625,6 +560,25 @@ class ZxImageView {
   toggleNext (type) {
     const $el = dom.query('._next-arrow', this.$container)
     if ($el) $el.style.display = type === 'show' ? 'block' : 'none'
+  }
+
+  /**
+   * 更新工具栏按钮
+   * 当一张图片时，隐藏左右按钮
+   * 2019-06-21
+   * @private
+   */
+  _updateToolbar () {
+    if (!this.$tool) return
+    let buttons = this.images.length <= 1
+      ? this.opts.toolbarButtons.filter(item => item !== 'prev' && item !== 'next')
+      : this.opts.toolbarButtons
+
+    let vnode = {
+      tag: 'div',
+      child: createToolbarButtons(buttons)
+    }
+    this.$tool.innerHTML = dom.getInnerHtml(vnode)
   }
 }
 

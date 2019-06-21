@@ -46,6 +46,9 @@ export default {
     })
     return $el
   },
+  getInnerHtml (vnode) {
+    return this.create(vnode).innerHTML
+  },
   /**
    * 选择满足条件的dom节点
    * @param selector
