@@ -1,4 +1,4 @@
-# image-view
+# zx-image-viewer
 
 图片预览插件，支持图片切换、旋转、缩放、移动...
 
@@ -17,15 +17,15 @@
 npm
 
 ```
-npm install zx-image-view --save-dev
+npm install zx-image-viewer --save-dev
 # 或
-npm i zx-image-view -D
+npm i zx-image-viewer -D
 ```
 
 ES6+
 
 ```javascript
-import { ZxImageView } from 'zx-image-view'
+import { ZxImageViewer } from 'zx-image-viewer'
 ```
 
 浏览器Brower
@@ -37,7 +37,7 @@ import { ZxImageView } from 'zx-image-view'
   <img data-index="2" src="c.jpg">
   <img data-index="3" src="d.jpg">
 </div>
-<script src="dist/js/zx-image-view.min.js"></script>
+<script src="dist/js/zx-image-viewer.min.js"></script>
 <script>
   // 初始化参数
   var options = {
@@ -78,7 +78,7 @@ import { ZxImageView } from 'zx-image-view'
 使用方法 1
 
 ```javascript
-var ziv1 = new ZxImageView(options, imgArray1);
+var ziv1 = new ZxImageViewer(options, imgArray1);
 
 // 点击缩略图，查看大图
 var $el = document.getElementById('imgList');
@@ -95,21 +95,21 @@ $el.addEventListener('click', function (e) {
 使用方法 2
 
 ```javascript
-var ziv2 = new ZxImageView(imgArray2);
+var ziv2 = new ZxImageViewer(imgArray2);
 ```
 
 使用方法 3
 
 ```javascript
-var ziv3 = new ZxImageView();
+var ziv3 = new ZxImageViewer();
 ziv3.init(imgArray2);
 ```
 
 使用方法 4
 
 ```javascript
-var ziv4 = new ZxImageView();
-// 业务场景，针对后台管理列表页，每条数据(动态)有多张图片，需独立预览，不需要多次实例化ZxImageView
+var ziv4 = new ZxImageViewer();
+// 业务场景，针对后台管理列表页，每条数据(动态)有多张图片，需独立预览，不需要多次实例化ZxImageViewer
 // 查看imgArray2第3张图片
 ziv4.view(2, imgArray2);
 ```
@@ -123,17 +123,17 @@ npm run dev
 
 ## # 效果图 preview
 
-![image-view](resource/view-1.jpg)
+![zx-image-viewer](resource/view-1.jpg)
 
-![image-view](resource/view-2.jpg)
+![zx-image-viewer](resource/view-2.jpg)
 
-![image-view](resource/mobile.jpg)
+![zx-image-viewer](resource/mobile.jpg)
 
 ## 参数 options
 
 |参数|类型|说明|
 |:--|:--|:--|
-|backgroundOpacity|Floor|背景遮罩(黑色)透明度，取值`0-1`，默认值`0.6`|
+|maskBackground|Floor|背景遮罩颜色，默认值`rgba(0, 0, 0, 0.6)`|
 |iconfont|String|iconfont图标字体css样式url地址(样式名见附录iconfont说明)|
 |keyboard|Object|键盘按钮(前/后一张、缩放、旋转、关闭)配置|
 |movable|Boolean|移动图片，默认值`true`|
@@ -185,7 +185,7 @@ let _config = {
     scale: 'mousewheel'
   }
 }
-new ZxImageView(_config);
+new ZxImageViewer(_config);
 ```
 
 ## 方法 methods
@@ -213,7 +213,7 @@ new ZxImageView(_config);
 
 字体样式`.zx`，图标样式如下图：
 
-![zx-image-view iconfont](resource/iconfont.png)
+![zx-image-viewer iconfont](resource/iconfont.png)
 
 http://www.iconfont.cn/
 

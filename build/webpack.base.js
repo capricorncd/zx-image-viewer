@@ -8,7 +8,7 @@ const htmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
   entry: {
-    'zx-image-view': './src/js/index.js'
+    'zx-image-viewer': './src/js/index.js'
   },
   output: {
     path: path.resolve(__dirname, '../dist'),

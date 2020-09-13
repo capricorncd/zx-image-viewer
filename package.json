@@ -1,13 +1,14 @@
 {
-  "name": "zx-image-view",
-  "version": "1.5.0",
-  "description": "Image view plugin",
+  "name": "zx-image-viewer",
+  "version": "1.6.0",
+  "description": "Image viewer",
   "author": "capricorncd",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/capricorncd/image-view.git"
+    "url": "git+https://github.com/capricorncd/zx-image-viewer.git"
   },
   "keywords": [
+    "zx-image-viewer",
     "imageView",
     "image",
     "view",
@@ -39,10 +40,10 @@
     "webpack-merge": "^4.1.2"
   },
   "bugs": {
-    "url": "https://github.com/capricorncd/image-view/issues"
+    "url": "https://github.com/capricorncd/zx-image-viewer/issues"
   },
-  "homepage": "https://github.com/capricorncd/image-view",
-  "main": "dist/js/zx-image-view.min.js",
+  "homepage": "https://github.com/capricorncd/zx-image-viewer",
+  "main": "dist/js/zx-image-viewer.min.js",
   "engines": {
     "node": ">= 6.0.0",
     "npm": ">= 3.0.0"
