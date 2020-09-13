@@ -13,3 +13,6 @@ __psd/
 *.ntvs*
 *.njsproj
 *.sln
+
+package-lock.json
+yarn.lock

@@ -52,14 +52,16 @@ const __DEFAULT = {
   // 图标字体
   iconfont: '//at.alicdn.com/t/font_613889_qd2ugx65fxadzpvi.css',
   // 工具栏按钮数量及顺序配置
-  toolbarButtons: ['prev', 'enlarge', 'rotate', 'reduce', 'next']
+  toolbarButtons: ['prev', 'enlarge', 'rotate', 'reduce', 'next'],
+  // mask background, default: 'rgba(0, 0, 0, .6)'
+  maskBackground: null
 }
 
 // const log = console.log
 
-const Z_INDEX = 9999
+const Z_INDEX = 10
 
-class ZxImageView {
+class ZxImageViewer {
   constructor (opts, arr) {
     if (typeof arr === 'undefined' && util.isArray(opts)) {
       arr = opts
@@ -88,7 +90,7 @@ class ZxImageView {
       tag: 'div',
       attrs: {
         class: 'zx-image-preview-wrapper',
-        style: 'display:none'
+        style: 'display:none;' + (opts.maskBackground ? `background:${opts.maskBackground}` : '')
       },
       child: [
         // 预览图片
@@ -139,10 +141,10 @@ class ZxImageView {
     this.$pagination = dom.query('.zip-pagination-wrapper', this.$container)
 
     // 背景透明度
-    if (typeof opts.backgroundOpacity !== 'undefined') {
-      const bo = util.toNumber(opts.backgroundOpacity)
-      this.$container.style.background = `rgba(0, 0, 0, ${bo})`
-    }
+    // if (typeof opts.backgroundOpacity !== 'undefined') {
+    //   const bo = util.toNumber(opts.backgroundOpacity)
+    //   this.$container.style.background = `rgba(0, 0, 0, ${bo})`
+    // }
 
     // preview是否显示
     this.isPreview = false
@@ -582,8 +584,10 @@ class ZxImageView {
   }
 }
 
-ZxImageView.prototype.on = broadcast.on
-ZxImageView.prototype.off = broadcast.off
-ZxImageView.prototype.emit = broadcast.emit
+ZxImageViewer.prototype.on = broadcast.on
+ZxImageViewer.prototype.off = broadcast.off
+ZxImageViewer.prototype.emit = broadcast.emit
 
-export { ZxImageView }
+export { ZxImageViewer }
+
+export default ZxImageViewer
