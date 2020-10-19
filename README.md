@@ -4,6 +4,12 @@
 
 浏览器支持：IE10+, (IE9不支持旋转功能)
 
+<p align="left">
+  <a href="https://npmcharts.com/compare/zx-image-viewer?minimal=true"><img src="https://img.shields.io/npm/dm/zx-image-viewer.svg?sanitize=true" alt="Downloads"></a>
+  <a href="https://www.npmjs.com/package/zx-image-viewer"><img src="https://img.shields.io/npm/v/zx-image-viewer.svg?sanitize=true" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/zx-image-viewer"><img src="https://img.shields.io/npm/l/zx-image-viewer.svg?sanitize=true" alt="License"></a>
+</p>
+
 ## 默认键盘操作
 
 > 方向键：左`left`右`right`前后图片切换，上`up`下`down`顺时针逆时针旋转
@@ -28,7 +34,7 @@ ES6+
 import { ZxImageViewer } from 'zx-image-viewer'
 ```
 
-浏览器Brower
+浏览器Browser
 
 ```html
 <div id="imgList">

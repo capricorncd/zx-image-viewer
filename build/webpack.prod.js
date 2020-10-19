@@ -4,6 +4,7 @@
  */
 const merge = require('webpack-merge')
 const webpack = require('webpack')
+const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const baseConfig = require('./webpack.base')
 const banner = require('./banner')
 
@@ -13,6 +14,7 @@ module.exports = merge(baseConfig, {
     filename: 'js/[name].min.js'
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new webpack.BannerPlugin(banner)
   ]
 })

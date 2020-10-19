@@ -3,7 +3,7 @@
  * https://github.com/capricorncd
  */
 const path = require('path')
-// const webpack = require('webpack')
+const { ProgressPlugin } = require('webpack')
 const htmlWebpackPlugin = require('html-webpack-plugin')
 
 module.exports = {
@@ -49,6 +49,7 @@ module.exports = {
     ]
   },
   plugins: [
+    new ProgressPlugin(),
     new htmlWebpackPlugin({
       template: 'index.html',
       filename: 'index.html',
